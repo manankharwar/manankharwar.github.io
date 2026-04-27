@@ -49,9 +49,10 @@
     #boot.out { opacity: 0; pointer-events: none; }
 
     #ascii {
-      white-space: pre; font-size: 9.5px; line-height: 1.2;
+      white-space: pre; font-size: 8px; line-height: 1.15;
       color: var(--accent-green); margin-bottom: 28px;
       opacity: 0; transition: opacity 0.5s ease;
+      font-weight: 700;
     }
     #ascii.show { opacity: 1; }
 
@@ -257,21 +258,23 @@
 
 <!-- ── BOOT SCREEN ────────────────────────────────────── -->
 <div id="boot">
-<pre id="ascii">         ______  __  __  ______  __  __
- /'\_/`\/\  _  \/\ \/\ \/\  _  \/\ \/\ \
-/\      \ \ \L\ \ \ `\\ \ \ \L\ \ \ `\\ \
-\ \ \__\ \ \  __ \ \ , ` \ \  __ \ \ , ` \
- \ \ \_/\ \ \ \/\ \ \ \`\ \ \ \/\ \ \ \`\ \
-  \ \_\\ \_\ \_\ \_\ \_\ \_\ \_\ \_\ \_\ \_\
-   \/_/ \/_/\/_/\/_/\/_/\/_/\/_/\/_/\/_/\/_/
+<pre id="ascii">888b     d888       d8888888b    888       d8888888b    888
+8888b   d8888      d888888888b   888      d888888888b   888
+88888b.d88888     d88P88888888b  888     d88P88888888b  888
+888Y88888P888    d88P 888888Y88b 888    d88P 888888Y88b 888
+888 Y888P 888   d88P  888888 Y88b888   d88P  888888 Y88b888
+888  Y8P  888  d88P   888888  Y88888  d88P   888888  Y88888
+888   "   888 d8888888888888   Y8888 d8888888888888   Y8888
+888       888d88P     888888    Y888d88P     888888    Y888
 
- __  __   __  __  ______  ____    __      __  ______  ____
-/\ \/\ \ /\ \/\ \/\  _  \/\  _`\ /\ \  __/\ \/\  _  \/\  _`\
-\ \ \/'/'\ \ \_\ \ \ \L\ \ \ \L\ \ \ \/\ \ \ \ \ \L\ \ \ \L\ \
- \ \ , <  \ \  _  \ \  __ \ \ ,  /\ \ \ \ \ \ \ \  __ \ \ ,  /
-  \ \ \\`\ \ \ \ \ \ \ \/\ \ \ \\ \\ \ \_/ \_\ \ \ \/\ \ \ \\ \
-   \ \_\ \_\\ \_\ \_\ \_\ \_\ \_\ \_\ `\___x___/\ \_\ \_\ \_\ \_\
-    \/_/\/_/ \/_/\/_/\/_/\/_/\/_/\/ /'\/__//__/  \/_/\/_/\/_/\/ /</pre>
+888    d8P 888    888       d88888888888b. 888       888       d88888888888b.
+888   d8P  888    888      d88888888   Y88b888   o   888      d88888888   Y88b
+888  d8P   888    888     d88P888888    888888  d8b  888     d88P888888    888
+888d88K    8888888888    d88P 888888   d88P888 d888b 888    d88P 888888   d88P
+8888888b   888    888   d88P  8888888888P" 888d88888b888   d88P  8888888888P"
+888  Y88b  888    888  d88P   888888 T88b  88888P Y88888  d88P   888888 T88b
+888   Y88b 888    888 d8888888888888  T88b 8888P   Y8888 d8888888888888  T88b
+888    Y88b888    888d88P     888888   T88b888P     Y888d88P     888888   T88b</pre>
   <div id="boot-log"></div>
 </div>
 
@@ -617,11 +620,11 @@ contact: {
 // ════════════════════════════════════════════════════════════
 const BOOT = [
   { cmd: 'boot --portfolio manan_kharwar_v1' },
-  { cmd: 'mount /home/manan/portfolio',            out: '  OK  read-write' },
-  { cmd: 'load ros2_jazzy fusioncore_core eigen3', out: '  OK  modules loaded' },
-  { cmd: 'calibrate imu --online',                 out: '  OK  bias=[0.0003,-0.0011,0.0007]' },
-  { cmd: 'gps --fix --rtk',                        out: '  OK  HDOP=0.9  acc=0.3m  sats=12' },
-  { cmd: 'init ui --theme github-dark',            out: '  OK  renderer ready' },
+  { cmd: 'mount /home/manan/portfolio' },
+  { cmd: 'load ros2_jazzy fusioncore_core eigen3' },
+  { cmd: 'calibrate imu --online' },
+  { cmd: 'gps --fix --rtk' },
+  { cmd: 'init ui --theme github-dark' },
   { cmd: 'echo "Ready."' },
 ];
 
