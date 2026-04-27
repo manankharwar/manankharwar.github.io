@@ -109,6 +109,7 @@
     .folder.active{ background: #21262d; border-left: 2px solid var(--accent-orange); }
 
     .arrow { display: inline-block; width: 15px; font-size: 10px; margin-right: 5px; transition: transform 0.2s; }
+    .tree-line { color: #444c56; margin-right: 6px; user-select: none; white-space: pre; flex-shrink: 0; }
 
     .folder-content { display: none; }
     .folder-content.open { display: block; animation: slideDown 0.25s ease-out; }
@@ -293,30 +294,30 @@
     <div class="sidebar">
       <div class="sidebar-header">Explorer</div>
       <div class="file-tree">
-        <div class="root-folder">PORTFOLIO</div>
+        <div class="root-folder">/home</div>
 
-        <div class="file active" id="fi-about" onclick="nav('about')">ABOUT_ME.md</div>
+        <div class="file active" id="fi-about" onclick="nav('about')"><span class="tree-line">├──</span>ABOUT_ME.md</div>
 
         <div class="folder" id="fold-proj" onclick="toggleF('proj')">
-          <span class="arrow" id="arr-proj">&#9654;</span> PROJECTS
+          <span class="tree-line">├──</span><span class="arrow" id="arr-proj">&#9660;</span> PROJECTS
         </div>
-        <div class="folder-content" id="ch-proj">
-          <div class="file child" id="fi-fc"    onclick="nav('fc')">fusioncore.cpp</div>
-          <div class="file child" id="fi-husky" onclick="nav('husky')">husky_bringup.yaml</div>
-          <div class="file child" id="fi-nav"   onclick="nav('nav')">nav2_bridge.cpp</div>
-          <div class="file child" id="fi-bench" onclick="nav('bench')">nclt_bench.py</div>
+        <div class="folder-content open" id="ch-proj">
+          <div class="file child" id="fi-fc"    onclick="nav('fc')"><span class="tree-line">│   ├──</span>fusioncore.cpp</div>
+          <div class="file child" id="fi-husky" onclick="nav('husky')"><span class="tree-line">│   ├──</span>husky_bringup.yaml</div>
+          <div class="file child" id="fi-nav"   onclick="nav('nav')"><span class="tree-line">│   ├──</span>nav2_bridge.cpp</div>
+          <div class="file child" id="fi-bench" onclick="nav('bench')"><span class="tree-line">│   └──</span>nclt_bench.py</div>
         </div>
 
         <div class="folder" id="fold-res" onclick="toggleF('res')">
-          <span class="arrow" id="arr-res">&#9654;</span> RESEARCH
+          <span class="tree-line">├──</span><span class="arrow" id="arr-res">&#9660;</span> RESEARCH
         </div>
-        <div class="folder-content" id="ch-res">
-          <div class="file child" id="fi-post"  onclick="nav('post')">fusioncore_post.md</div>
-          <div class="file child" id="fi-notes" onclick="nav('notes')">nclt_notes.txt</div>
+        <div class="folder-content open" id="ch-res">
+          <div class="file child" id="fi-post"  onclick="nav('post')"><span class="tree-line">│   ├──</span>fusioncore_post.md</div>
+          <div class="file child" id="fi-notes" onclick="nav('notes')"><span class="tree-line">│   └──</span>nclt_notes.txt</div>
         </div>
 
-        <div class="file" id="fi-contact" onclick="nav('contact')">CONTACT.json</div>
-        <div class="file" onclick="alert('Resume coming soon.')">RESUME.pdf</div>
+        <div class="file" id="fi-contact" onclick="nav('contact')"><span class="tree-line">├──</span>CONTACT.json</div>
+        <div class="file" onclick="alert('Resume coming soon.')"><span class="tree-line">└──</span>RESUME.pdf</div>
       </div>
     </div>
 
@@ -671,7 +672,7 @@ function nav(id) {
   initMonitor(id);
 }
 
-const foldState = {};
+const foldState = { proj: true, res: true };
 function toggleF(id) {
   foldState[id] = !foldState[id];
   document.getElementById('ch-' + id).classList.toggle('open', foldState[id]);
