@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manan Kharwar</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #0d0d0d;
+      --bg2:       #111111;
+      --bg3:       #1a1a1a;
+      --border:    #252525;
+      --green:     #00ff41;
+      --green-dim: #00cc33;
+      --green-dark:#003a10;
+      --amber:     #e8c97a;
+      --blue:      #4fc1ff;
+      --red:       #ff5f57;
+      --muted:     #555555;
+      --text:      #cccccc;
+      --text-dim:  #888888;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--green);
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 13px;
+      overflow: hidden;
+    }
+
+    /* ── BOOT SCREEN ───────────────────────────────────────────── */
+    #boot {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 12vw;
+      z-index: 999;
+      transition: opacity 0.7s ease;
+    }
+
+    #boot.fade-out { opacity: 0; pointer-events: none; }
+
+    #ascii {
+      white-space: pre;
+      font-size: 10px;
+      line-height: 1.15;
+      color: var(--green);
+      margin-bottom: 28px;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    #ascii.show { opacity: 1; }
+
+    #boot-log { display: flex; flex-direction: column; gap: 3px; }
+
+    .boot-line {
+      color: var(--text-dim);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .boot-line.show { opacity: 1; transform: none; }
+    .boot-line .ps1-user  { color: var(--green-dim); }
+    .boot-line .ps1-sep   { color: var(--muted); }
+    .boot-line .ps1-dir   { color: var(--blue); }
+    .boot-line .ps1-cmd   { color: var(--text); }
+    .boot-line .ok        { color: var(--green); }
+    .boot-line .warn      { color: var(--amber); }
+
+    /* ── MAIN LAYOUT ────────────────────────────────────────────── */
+    #app {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #app.visible { display: flex; }
+
+    /* title bar */
+    #titlebar {
+      height: 30px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 7px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.red    { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green  { background: #28c840; }
+    #titlebar-label {
+      margin-left: auto;
+      margin-right: auto;
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    /* body row (sidebar + content) */
+    #body { display: flex; flex: 1; min-height: 0; }
+
+    /* activity bar (thin icon strip) */
+    #actbar {
+      width: 42px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 8px;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .act-icon {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .act-icon:hover, .act-icon.active { color: var(--green); background: var(--bg3); }
+
+    /* sidebar */
+    #sidebar {
+      width: 200px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-section { font-size: 10px; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.1em; padding: 10px 12px 6px; }
+
+    .tree-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-dim);
+      transition: background 0.1s, color 0.1s;
+      user-select: none;
+    }
+    .tree-item:hover { background: var(--bg3); color: var(--text); }
+    .tree-item.active { background: #1a2a1a; color: var(--green); }
+    .tree-item.folder { color: var(--amber); font-size: 12px; }
+    .tree-item.folder:hover { color: var(--amber); }
+    .tree-item.child { padding-left: 26px; }
+    .tree-icon { width: 14px; font-size: 11px; text-align: center; flex-shrink: 0; }
+
+    /* content */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 40px 48px;
+      background: var(--bg);
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-path {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 22px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 { color: var(--green); font-size: 22px; margin-bottom: 4px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 22px; }
+    h2 { color: var(--green-dim); font-size: 14px; margin: 22px 0 8px; }
+    h3 { color: var(--green); font-size: 13px; margin: 14px 0 6px; }
+
+    p { color: var(--text); line-height: 1.75; margin-bottom: 10px; font-size: 13px; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag {
+      padding: 2px 9px;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-size: 11px;
+      border-radius: 2px;
+      background: #001a07;
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid #1e3a1e;
+      border-left: 3px solid var(--green);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      border-radius: 2px;
+    }
+    .card h3 { margin-top: 0; font-size: 14px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { color: var(--muted); font-weight: normal; text-align: left;
+      padding: 5px 10px; border-bottom: 1px solid var(--border); }
+    td { padding: 5px 10px; color: var(--text); border-bottom: 1px solid #181818; }
+    td.win { color: #16A34A; }
+    td.lose { color: #ef4444; }
+    td.fc { color: var(--green); }
+
+    .note { font-size: 11px; color: var(--muted); margin-top: 10px; font-style: italic; }
+
+    /* JSON contact */
+    .json-view {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--text);
+    }
+    .jk { color: #9cdcfe; }
+    .js { color: #ce9178; }
+    .jl { color: var(--blue); cursor: pointer; text-decoration: underline; }
+    .jl:hover { color: var(--green); }
+    .jp { color: var(--muted); }
+
+    /* status bar */
+    #statusbar {
+      height: 22px;
+      background: var(--green);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 11px;
+      font-weight: bold;
+      gap: 16px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    #status-file { margin-left: auto; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+    /* cursor */
+    .cursor {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: var(--green);
+      vertical-align: middle;
+      margin-left: 1px;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    a { color: var(--blue); }
+    code { color: var(--green); font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<!-- ── BOOT SCREEN ─────────────────────────────────────────────── -->
+<div id="boot">
+  <pre id="ascii">
+ ██████╗  ██╗  ██╗ ██████╗  ██████╗   ████╗  ██╗         ██╗ ██╗  ██╗  ███╗    ██████╗    ██╗    ██╗  ██╗  ██████╗    ██████╗
+ ██╔══██╗ ███╗ ██║ ██╔══██╗ ██╔══██╗ ██╔══██╗ ██╗        ██╔╝ ██║  ██║ ██╔██╗  ██╔══██╗  ██╔██╗  ██║  ██║  ██╔══██╗  ██╔══██╗
+ ██████╔╝ ██╔██╗██║ ██████╔╝ ██████╔╝ ███████║  ██╗      ██╔╝  ██╗███╔╝ ██║╚██╗ ██████╔╝ ██╔╝╚██╗ ██║  ██║  ███████║  ██████╔╝
+ ██╔══██╗ ██║╚████║ ██╔══██╗ ██╔══██╗ ██╔══██║  ╚██╗    ██╔╝   ╚████╔╝  ██║ ╚██╗██╔═══╝  ███████╔╝ ╚████╔╝  ██╔══██║  ██╔══██╗
+ ██║  ██║ ██║ ╚███║ ██║  ██║ ██║  ██║ ██║  ██║   ╚██╗  ██╔╝     ╚██╔╝   ██║  ╚██╗██║      ██╔══██║   ╚██╔╝   ██║  ██║  ██║  ██║
+ ╚═╝  ╚═╝ ╚═╝  ╚══╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝    ╚═══╝╚═╝       ╚═╝    ╚═╝   ╚═╝╚═╝      ╚═╝  ╚═╝    ╚═╝    ╚═╝  ╚═╝  ╚═╝  ╚═╝
+</pre>
+
+  <div id="boot-log"></div>
+</div>
+
+<!-- ── MAIN APP ─────────────────────────────────────────────────── -->
+<div id="app">
+  <!-- title bar -->
+  <div id="titlebar">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+    <span id="titlebar-label">manan@portfolio: ~/portfolio</span>
+  </div>
+
+  <div id="body">
+    <!-- activity bar -->
+    <div id="actbar">
+      <div class="act-icon active" title="Explorer" onclick="toggleSidebar()">&#9776;</div>
+      <div class="act-icon" title="GitHub" onclick="window.open('https://github.com/manankharwar')">&#9671;</div>
+    </div>
+
+    <!-- sidebar -->
+    <div id="sidebar">
+      <div class="sidebar-section">Portfolio</div>
+
+      <div class="tree-item active" id="fi-about" onclick="nav('about')">
+        <span class="tree-icon">&#128196;</span> ABOUT_ME.md
+      </div>
+
+      <div class="tree-item folder" id="fi-proj" onclick="toggleFolder()">
+        <span class="tree-icon" id="proj-arrow">&#9654;</span> PROJECTS
+      </div>
+      <div id="proj-children" style="display:none">
+        <div class="tree-item child" id="fi-fc" onclick="nav('fc')">
+          <span class="tree-icon">&#9881;</span> fusioncore.cpp
+        </div>
+        <div class="tree-item child" id="fi-bench" onclick="nav('bench')">
+          <span class="tree-icon">&#128202;</span> benchmarks.py
+        </div>
+      </div>
+
+      <div class="tree-item" id="fi-contact" onclick="nav('contact')">
+        <span class="tree-icon">&#123;</span> CONTACT.json
+      </div>
+
+      <div class="tree-item" onclick="alert('Resume coming soon.')">
+        <span class="tree-icon">&#128196;</span> RESUME.pdf
+      </div>
+    </div>
+
+    <!-- content -->
+    <div id="content">
+
+      <!-- ABOUT ME -->
+      <div class="page active" id="pg-about">
+        <div class="page-path">~/portfolio/ABOUT_ME.md</div>
+        <h1>Manan Kharwar</h1>
+        <div class="subtitle">Robotics Software Engineer &nbsp;·&nbsp; Sensor Fusion &nbsp;·&nbsp; Autonomous Systems<span class="cursor"></span></div>
+
+        <h2># Who I am</h2>
+        <p>
+          I build software for robots that need to know where they are. My focus is sensor fusion —
+          taking noisy, unreliable signals from IMUs, GPS, and wheel encoders and producing a single,
+          reliable state estimate your robot can actually navigate from.
+        </p>
+        <p>
+          I'm the author of <code>FusionCore</code>, a ROS 2 UKF that I built after hitting the same
+          walls with <code>robot_localization</code> too many times: no native ECEF GPS handling,
+          no IMU bias estimation, and noise covariances you have to hand-tune and re-tune.
+        </p>
+        <p>
+          I benchmark honestly. Six sequences across all four seasons on NCLT — wins and the one loss
+          both reported.
+        </p>
+
+        <h2># Stack</h2>
+        <div class="tags">
+          <span class="tag">ROS 2 Jazzy</span>
+          <span class="tag">C++17</span>
+          <span class="tag">Python 3</span>
+          <span class="tag">Eigen3</span>
+          <span class="tag">UKF / EKF</span>
+          <span class="tag">GNSS / RTK / ECEF</span>
+          <span class="tag">IMU bias estimation</span>
+          <span class="tag">Nav2</span>
+          <span class="tag">Linux / WSL2</span>
+          <span class="tag">CMake</span>
+          <span class="tag">colcon</span>
+        </div>
+
+        <h2># Currently</h2>
+        <p>
+          Running the FusionCore NCLT benchmark suite — 6 outdoor sequences, identical config,
+          same pipeline as robot_localization. Writing about it openly.
+        </p>
+      </div>
+
+      <!-- FUSIONCORE -->
+      <div class="page" id="pg-fc">
+        <div class="page-path">~/portfolio/PROJECTS/fusioncore.cpp</div>
+        <h1>FusionCore</h1>
+        <div class="subtitle">ROS 2 UKF sensor fusion &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; Active</div>
+
+        <p>
+          A 22-state Unscented Kalman Filter for mobile robots. Fuses IMU, wheel encoders, and GPS
+          into one position estimate at 100 Hz. No manual noise tuning.
+        </p>
+
+        <h2>## Why it exists</h2>
+        <p>
+          <code>robot_localization</code> is the default answer for ROS sensor fusion. It works, but
+          it has real gaps: GPS goes through <code>navsat_transform</code> (extra node, added latency,
+          UTM zone boundary issues), no IMU bias estimation, noise covariances you tune by hand.
+        </p>
+        <p>
+          The designated replacement (<code>fuse</code>) still has incomplete GPS support as of early 2026.
+          So I built FusionCore. ECEF GPS handled natively — no coordinate projection, no extra node.
+          IMU bias estimated online. Noise covariance adapted from the innovation sequence.
+          Every sensor gated with a chi-squared test.
+        </p>
+
+        <h2>## Benchmark — NCLT dataset, 6 sequences, all seasons</h2>
+        <div class="card">
+          <h3>vs robot_localization EKF — same config, same pipeline</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Sequence</th>
+                <th style="text-align:right">FC ATE</th>
+                <th style="text-align:right">RL ATE</th>
+                <th style="text-align:right">Winner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Jan 2012 (Winter)</td><td class="fc" style="text-align:right">5.6 m</td><td style="text-align:right">23.5 m</td><td class="win" style="text-align:right">FC &nbsp;4.2×</td></tr>
+              <tr><td>Feb 2012 (Winter)</td><td class="fc" style="text-align:right">9.7 m</td><td style="text-align:right">20.5 m</td><td class="win" style="text-align:right">FC &nbsp;2.1×</td></tr>
+              <tr><td>Mar 2012 (Spring)</td><td class="fc" style="text-align:right">4.2 m</td><td style="text-align:right">10.8 m</td><td class="win" style="text-align:right">FC &nbsp;2.6×</td></tr>
+              <tr><td>Aug 2012 (Summer)</td><td class="fc" style="text-align:right">7.5 m</td><td style="text-align:right">9.4 m</td><td class="win" style="text-align:right">FC &nbsp;1.3×</td></tr>
+              <tr><td>Nov 2012 (Fall)</td><td style="text-align:right">28.7 m</td><td class="fc" style="text-align:right">10.9 m</td><td class="lose" style="text-align:right">RL &nbsp;2.6×</td></tr>
+              <tr><td>Feb 2013 (Winter)</td><td class="fc" style="text-align:right">4.1 m</td><td style="text-align:right">5.8 m</td><td class="win" style="text-align:right">FC &nbsp;1.4×</td></tr>
+            </tbody>
+          </table>
+          <p class="note">ATE RMSE (m). Lower is better. Nov 2012: degraded GPS season. FC's rejection gate works against it when GPS noise is high but consistent — RL corrects faster without a gate.</p>
+        </div>
+
+        <h2>## Links</h2>
+        <p>
+          <a href="https://github.com/manankharwar/fusioncore" target="_blank">github.com/manankharwar/fusioncore</a>
+        </p>
+
+        <div class="tags">
+          <span class="tag">ROS 2 Jazzy</span>
+          <span class="tag">C++17</span>
+          <span class="tag">UKF</span>
+          <span class="tag">ECEF GPS</span>
+          <span class="tag">IMU bias</span>
+          <span class="tag">chi-squared gating</span>
+          <span class="tag">100 Hz</span>
+          <span class="tag">Apache 2.0</span>
+        </div>
+      </div>
+
+      <!-- BENCHMARKS -->
+      <div class="page" id="pg-bench">
+        <div class="page-path">~/portfolio/PROJECTS/benchmarks.py</div>
+        <h1>NCLT Benchmark Suite</h1>
+        <div class="subtitle">Reproducible &nbsp;·&nbsp; Open methodology &nbsp;·&nbsp; All seasons</div>
+
+        <p>
+          A full pipeline for benchmarking robot localization on the NCLT (University of Michigan
+          North Campus Long-Term Vision and Lidar Dataset). Six sequences across winter, spring,
+          summer, and fall. RTK GPS as ground truth.
+        </p>
+
+        <h2>## Why it matters</h2>
+        <p>
+          Most sensor fusion benchmarks cherry-pick their best sequence. This one doesn't.
+          All six sequences are reported — including the one FusionCore loses.
+        </p>
+        <p>
+          The RL comparison uses Mahalanobis gating enabled (chi²(2,0.999) = 13.82 → threshold 3.72).
+          The gate had no effect on any of the six sequences — original comparison was already fair.
+        </p>
+
+        <h2>## Pipeline</h2>
+        <div class="card">
+          <h3>Reproducible end-to-end</h3>
+          <p style="font-size:12px; color: var(--muted);">
+            ROS2 bag playback at 3× speed<br>
+            → FusionCore &amp; RL-EKF record to bag<br>
+            → TUM trajectory files extracted<br>
+            → <code>evo_ape</code> ATE evaluation<br>
+            → matplotlib publication figures
+          </p>
+        </div>
+
+        <div class="tags">
+          <span class="tag">Python 3</span>
+          <span class="tag">evo</span>
+          <span class="tag">matplotlib</span>
+          <span class="tag">ROS 2</span>
+          <span class="tag">NCLT dataset</span>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="page" id="pg-contact">
+        <div class="page-path">~/portfolio/CONTACT.json</div>
+        <h1>Contact</h1>
+
+        <div class="json-view" style="margin-top:24px">
+          <span class="jp">{</span><br>
+          &nbsp;&nbsp;<span class="jk">"name"</span><span class="jp">:</span> <span class="js">"Manan Kharwar"</span><span class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"github"</span><span class="jp">:</span> <span class="jl" onclick="window.open('https://github.com/manankharwar')">"github.com/manankharwar"</span><span class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"linkedin"</span><span class="jp">:</span> <span class="jl" onclick="window.open('https://linkedin.com/in/manankharwar')">"linkedin.com/in/manankharwar"</span><span class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"open_to"</span><span class="jp">:</span> [<span class="js">"robotics engineering"</span><span class="jp">,</span> <span class="js">"sensor fusion"</span><span class="jp">,</span> <span class="js">"collaboration"</span>]<span class="jp">,</span><br>
+          &nbsp;&nbsp;<span class="jk">"preferred_contact"</span><span class="jp">:</span> <span class="js">"GitHub issues or discussions"</span><br>
+          <span class="jp">}</span>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /body -->
+
+  <!-- status bar -->
+  <div id="statusbar">
+    <span>&#11042; MANAN KHARWAR</span>
+    <span style="opacity:0.4">|</span>
+    <span>ROS 2 &middot; C++ &middot; Sensor Fusion</span>
+    <span id="status-file" style="margin-left:auto">ABOUT_ME.md</span>
+  </div>
+</div><!-- /app -->
+
+<script>
+  // ── BOOT ──────────────────────────────────────────────────────
+  const BOOT_LINES = [
+    { ps: true,  text: 'Initializing system...' },
+    { ps: true,  text: 'Establishing neural link...' },
+    { ps: true,  text: 'Mounting /home/manan/portfolio...',   cls: 'ok', after: '  ✓ OK' },
+    { ps: true,  text: 'Loading sensor fusion modules...',    cls: 'ok', after: '  ✓ OK' },
+    { ps: true,  text: 'Calibrating IMU bias estimator...',   cls: 'ok', after: '  ✓ bias = [0.0003, -0.0011, 0.0007]' },
+    { ps: true,  text: 'GPS fix acquired...',                 cls: 'ok', after: '  ✓ HDOP 0.9  accuracy 0.3 m' },
+    { ps: true,  text: 'Initializing UI components...',       cls: 'ok', after: '  ✓ OK' },
+    { ps: false, text: 'Ready.',                              cls: 'ok' },
+  ];
+
+  const log = document.getElementById('boot-log');
+
+  function mkLine(cfg) {
+    const div = document.createElement('div');
+    div.className = 'boot-line';
+    if (cfg.ps) {
+      div.innerHTML =
+        `<span class="ps1-user">manan@portfolio</span><span class="ps1-sep">:</span><span class="ps1-dir">~</span><span class="ps1-sep">$</span> <span class="ps1-cmd">${cfg.text}</span>` +
+        (cfg.after ? `<span class="${cfg.cls}">${cfg.after}</span>` : '');
+    } else {
+      div.innerHTML = `<span class="${cfg.cls || ''}">${cfg.text}</span>`;
+    }
+    return div;
+  }
+
+  // show ASCII first
+  setTimeout(() => document.getElementById('ascii').classList.add('show'), 120);
+
+  // stagger boot lines
+  BOOT_LINES.forEach((cfg, i) => {
+    const delay = 600 + i * 280;
+    setTimeout(() => {
+      const el = mkLine(cfg);
+      log.appendChild(el);
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+    }, delay);
+  });
+
+  // fade boot → app
+  const totalBoot = 600 + BOOT_LINES.length * 280 + 520;
+  setTimeout(() => {
+    document.getElementById('boot').classList.add('fade-out');
+    setTimeout(() => {
+      document.getElementById('boot').style.display = 'none';
+      const app = document.getElementById('app');
+      app.classList.add('visible');
+    }, 720);
+  }, totalBoot);
+
+  // ── NAV ───────────────────────────────────────────────────────
+  const FILE_MAP = {
+    about:   { file: 'fi-about',   page: 'pg-about',   status: 'ABOUT_ME.md',    title: '~/portfolio/ABOUT_ME.md'            },
+    fc:      { file: 'fi-fc',      page: 'pg-fc',      status: 'fusioncore.cpp', title: '~/portfolio/PROJECTS/fusioncore.cpp' },
+    bench:   { file: 'fi-bench',   page: 'pg-bench',   status: 'benchmarks.py',  title: '~/portfolio/PROJECTS/benchmarks.py'  },
+    contact: { file: 'fi-contact', page: 'pg-contact', status: 'CONTACT.json',   title: '~/portfolio/CONTACT.json'            },
+  };
+
+  let current = 'about';
+
+  function nav(id) {
+    if (id === current) return;
+    const prev = FILE_MAP[current];
+    const next = FILE_MAP[id];
+
+    document.getElementById(prev.page).classList.remove('active');
+    document.getElementById(prev.file).classList.remove('active');
+
+    document.getElementById(next.page).classList.add('active');
+    document.getElementById(next.file).classList.add('active');
+    document.getElementById('status-file').textContent = next.status;
+    document.getElementById('titlebar-label').textContent = 'manan@portfolio: ' + next.title;
+
+    current = id;
+    document.getElementById('content').scrollTop = 0;
+  }
+
+  let projOpen = false;
+  function toggleFolder() {
+    projOpen = !projOpen;
+    document.getElementById('proj-children').style.display = projOpen ? 'block' : 'none';
+    document.getElementById('proj-arrow').innerHTML = projOpen ? '&#9660;' : '&#9654;';
+  }
+
+  let sidebarVisible = true;
+  function toggleSidebar() {
+    sidebarVisible = !sidebarVisible;
+    document.getElementById('sidebar').style.display = sidebarVisible ? 'flex' : 'none';
+  }
+</script>
+
+</body>
+</html>
