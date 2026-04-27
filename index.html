@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <style>
+    /* ── Nathan-exact variables ──────────────────────────── */
     :root {
       --bg-color:      #0d1117;
       --sidebar-bg:    #161b22;
@@ -37,7 +38,7 @@
     ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-    /* ── BOOT ──────────────────────────────────────────── */
+    /* ── BOOT ────────────────────────────────────────────── */
     #boot {
       position: fixed; inset: 0;
       background: var(--bg-color);
@@ -48,10 +49,8 @@
     #boot.out { opacity: 0; pointer-events: none; }
 
     #ascii {
-      white-space: pre;
-      font-size: 9.5px; line-height: 1.2;
-      color: var(--accent-green);
-      margin-bottom: 28px;
+      white-space: pre; font-size: 9.5px; line-height: 1.2;
+      color: var(--accent-green); margin-bottom: 28px;
       opacity: 0; transition: opacity 0.5s ease;
     }
     #ascii.show { opacity: 1; }
@@ -60,8 +59,7 @@
     .bl {
       font-size: 13px; color: var(--text-secondary);
       opacity: 0; transform: translateY(4px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      white-space: pre;
+      transition: opacity 0.2s ease, transform 0.2s ease; white-space: pre;
     }
     .bl.show { opacity: 1; transform: none; }
     .bl .u { color: var(--accent-green); }
@@ -69,39 +67,30 @@
     .bl .s { color: var(--text-secondary); }
     .bl .ok { color: var(--accent-green); }
 
-    /* ── WINDOW ────────────────────────────────────────── */
+    /* ── WINDOW ──────────────────────────────────────────── */
     #app { display: none; flex-direction: column; height: 100vh; border: 1px solid var(--border-color); }
     #app.on { display: flex; }
 
     .window-chrome {
-      background: var(--header-bg);
-      height: 35px; display: flex; align-items: center;
-      padding: 0 15px; border-bottom: 1px solid var(--border-color);
+      background: var(--header-bg); height: 35px;
+      display: flex; align-items: center; padding: 0 15px;
+      border-bottom: 1px solid var(--border-color);
       user-select: none; flex-shrink: 0;
     }
     .window-controls { display: flex; gap: 8px; }
     .control-dot { width: 12px; height: 12px; border-radius: 50%; }
     .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-    .window-title {
-      margin-left: 20px; font-size: 13px;
-      color: var(--text-secondary); white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
-    }
+    .window-title { margin-left: 20px; font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .app-layout { display: flex; flex-grow: 1; overflow: hidden; }
+    .app-layout { display: flex; flex-grow: 1; overflow: hidden; position: relative; }
 
-    /* ── SIDEBAR ───────────────────────────────────────── */
+    /* ── SIDEBAR ─────────────────────────────────────────── */
     .sidebar {
       width: 260px; background: var(--sidebar-bg);
       border-right: 1px solid var(--border-color);
-      display: flex; flex-direction: column; flex-shrink: 0;
-      overflow-y: auto;
+      display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto;
     }
-    .sidebar-header {
-      padding: 10px 15px; font-size: 11px; font-weight: bold;
-      color: var(--text-secondary); letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+    .sidebar-header { padding: 10px 15px; font-size: 11px; font-weight: bold; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; }
     .file-tree { padding: 6px 0; font-family: 'Fira Code', monospace; }
     .root-folder { padding: 5px 15px; color: var(--text-secondary); font-weight: bold; font-size: 13px; }
 
@@ -110,139 +99,163 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       display: flex; align-items: center;
       border-left: 2px solid transparent;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
     }
     .folder:hover, .file:hover { background: #21262d; padding-left: 20px; }
     .folder { color: var(--accent-orange); font-weight: 500; }
-    .file { color: var(--accent-blue); }
-    .file.active { background: #21262d; border-left: 2px solid var(--accent-blue); color: var(--text-primary); }
-    .folder.active { background: #21262d; border-left: 2px solid var(--accent-orange); }
+    .file   { color: var(--accent-blue); }
+    .file.active  { background: #21262d; border-left: 2px solid var(--accent-blue); color: var(--text-primary); }
+    .folder.active{ background: #21262d; border-left: 2px solid var(--accent-orange); }
 
-    .tree-line { color: #444c56; margin-right: 8px; user-select: none; white-space: pre; }
     .arrow { display: inline-block; width: 15px; font-size: 10px; margin-right: 5px; transition: transform 0.2s; }
 
-    .folder-content { display: none; overflow: hidden; }
+    .folder-content { display: none; }
     .folder-content.open { display: block; animation: slideDown 0.25s ease-out; }
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
+      from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── CONTENT ───────────────────────────────────────── */
-    .content-area {
-      flex-grow: 1; padding: 30px 40px;
-      overflow-y: auto; line-height: 1.6;
-      background: var(--bg-color);
-    }
+    .child { padding-left: 32px !important; }
+    .child:hover { padding-left: 36px !important; }
+
+    /* ── CONTENT ─────────────────────────────────────────── */
+    .content-area { flex-grow: 1; padding: 30px 40px; overflow-y: auto; line-height: 1.6; background: var(--bg-color); }
 
     .page-header { border-bottom: 1px solid var(--border-color); margin-bottom: 25px; padding-bottom: 15px; }
     .page-header h1 { margin: 0; color: var(--accent-green); font-size: 24px; }
     .page-header .path { font-size: 11px; color: var(--text-secondary); margin-top: 5px; }
 
     .tags { margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .tag { font-size: 10px; background: rgba(88,166,255,0.1); color: var(--accent-blue);
-      padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(88,166,255,0.3); }
-    .tag.green { background: rgba(57,211,83,0.1); color: var(--accent-green); border-color: rgba(57,211,83,0.3); }
+    .tag { font-size: 10px; background: rgba(88,166,255,0.1); color: var(--accent-blue); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(88,166,255,0.3); }
+    .tag.green  { background: rgba(57,211,83,0.1);  color: var(--accent-green);  border-color: rgba(57,211,83,0.3); }
     .tag.orange { background: rgba(240,136,62,0.1); color: var(--accent-orange); border-color: rgba(240,136,62,0.3); }
 
-    p { margin-bottom: 12px; font-size: 13px; color: var(--text-primary); line-height: 1.7; }
+    p  { margin-bottom: 12px; font-size: 13px; color: var(--text-primary); line-height: 1.7; }
     h3 { color: var(--accent-blue); margin: 20px 0 10px; font-size: 16px; }
     ul { padding-left: 20px; margin-bottom: 16px; }
     li { margin-bottom: 7px; font-size: 13px; }
-    a { color: var(--accent-blue); text-decoration: none; }
+    a  { color: var(--accent-blue); text-decoration: none; }
     a:hover { text-decoration: underline; }
     code { color: var(--accent-orange); font-family: 'Fira Code', monospace; font-size: 12px; }
 
     .project-details, .research-details {
-      background: rgba(33,38,45,0.4);
-      padding: 25px; border-radius: 8px; margin-bottom: 25px;
+      background: rgba(33,38,45,0.4); padding: 25px; border-radius: 8px; margin-bottom: 25px;
     }
     .project-details h3 { color: var(--accent-blue); margin-top: 0; }
 
-    /* ── RETRO COMPUTER ────────────────────────────────── */
-    .retro-computer {
-      display: flex; flex-direction: column; align-items: center;
-      margin: 30px 0;
-    }
+    /* ── RETRO COMPUTER ──────────────────────────────────── */
+    .retro-computer { display: flex; flex-direction: column; align-items: center; margin: 30px 0; }
+
     .retro-monitor {
-      background: #c8b89a;
+      background: linear-gradient(135deg, #d4c4a8 0%, #c8b89a 40%, #bba882 100%);
       border-radius: 20px 20px 8px 8px;
-      padding: 14px 14px 40px;
-      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.6);
-      width: 100%; max-width: 620px; position: relative;
+      padding: 14px 14px 44px;
+      box-shadow: inset 0 3px 8px rgba(255,255,255,0.25), inset 0 -2px 4px rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.7);
+      width: 100%; max-width: 640px; position: relative;
     }
     .retro-screen-frame {
-      background: #1a1a1a;
+      background: #111;
       border-radius: 10px;
       padding: 6px;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 0 0 1px #000;
     }
     .retro-screen {
       background: #000d00;
       border-radius: 7px;
-      height: 300px;
+      height: 320px;
       overflow: hidden;
-      display: flex;
       position: relative;
       font-family: 'Fira Code', monospace;
       font-size: 12px;
       color: #33ff33;
     }
+    /* scanline effect */
+    .retro-screen::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+      pointer-events: none; border-radius: 7px;
+    }
+
     .power-button {
-      position: absolute; bottom: 12px; right: 18px;
+      position: absolute; bottom: 13px; right: 20px;
       width: 14px; height: 14px;
       background: radial-gradient(circle at 40% 35%, #ff6b6b, #c0392b);
       border-radius: 50%;
-      box-shadow: 0 0 6px rgba(255,0,0,0.5);
+      box-shadow: 0 0 8px rgba(255,0,0,0.6);
+      cursor: pointer; transition: box-shadow 0.2s;
     }
+    .power-button:hover { box-shadow: 0 0 14px rgba(255,0,0,0.9); }
+
     .retro-base {
-      background: linear-gradient(to bottom, #c8b89a, #b0a080);
-      width: 85%; max-width: 528px;
-      height: 22px; border-radius: 0 0 12px 12px;
+      background: linear-gradient(to bottom, #c8b89a, #a89070);
+      width: 82%; max-width: 524px; height: 22px;
+      border-radius: 0 0 14px 14px;
       display: flex; align-items: center; justify-content: center; gap: 18px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
     }
     .vent { width: 28px; height: 4px; background: rgba(0,0,0,0.2); border-radius: 2px; }
 
-    .terminal-loader {
-      display: none; flex-direction: column; justify-content: flex-start;
-      padding: 18px; width: 100%; gap: 6px; line-height: 1.5;
-    }
-    .terminal-loader.active { display: flex; }
-    .terminal-loader p { color: #33ff33; font-size: 12px; margin: 0; }
-    .terminal-loader p:last-child { margin-top: auto; }
-    .typing-text { animation: typing 1.5s steps(40) forwards; overflow: hidden; white-space: nowrap; width: 0; }
-    @keyframes typing { to { width: 100%; } }
+    /* monitor views */
+    .mon-view { display: none; width: 100%; height: 100%; padding: 16px; overflow: hidden; }
+    .mon-view.active { display: block; }
 
-    .file-explorer {
-      display: none; flex-direction: column;
-      padding: 14px; width: 100%; overflow-y: auto; gap: 0;
+    .mon-label {
+      font-size: 10px; color: #22cc22; margin-bottom: 10px;
+      border-bottom: 1px solid #1a4a1a; padding-bottom: 5px;
+      letter-spacing: 0.08em;
     }
-    .file-explorer.active { display: flex; }
-    .file-explorer p { color: var(--accent-green); font-size: 11px; margin: 0 0 8px; }
 
-    .file-item {
-      padding: 7px 10px; cursor: pointer;
-      font-size: 12px; color: #33ff33;
-      border-radius: 3px;
-      transition: background 0.15s;
-      display: flex; gap: 10px; align-items: center;
-    }
-    .file-item:hover { background: rgba(57,211,83,0.12); }
-    .file-item span { color: #66ff66; opacity: 0.7; white-space: nowrap; }
+    /* live terminal view */
+    .live-term { font-size: 11.5px; line-height: 1.65; color: #33ff33; }
+    .live-term .dim  { color: #1a8a1a; }
+    .live-term .hi   { color: #88ffaa; font-weight: 500; }
+    .live-term .warn { color: #ffcc44; }
+    .live-term .err  { color: #ff5555; }
+    .live-term .bar  { color: #33ff33; }
 
-    /* ── STATUS BAR ────────────────────────────────────── */
+    /* file explorer view */
+    .mon-files { font-size: 11.5px; line-height: 1.65; }
+    .mon-file  { padding: 5px 6px; cursor: default; display: flex; gap: 10px; border-radius: 3px; transition: background 0.1s; }
+    .mon-file:hover { background: rgba(57,211,83,0.12); }
+    .mon-file .ext { color: #22aa22; min-width: 56px; }
+    .mon-file .name { color: #66ff88; }
+
+    /* nav grid */
+    .nav-grid { font-size: 14px; line-height: 1.6; letter-spacing: 4px; color: #33ff33; }
+    .nav-grid .robot { color: #88ffaa; font-weight: bold; }
+    .nav-grid .goal  { color: #ffcc44; }
+    .nav-grid .wall  { color: #1a4a1a; }
+    .nav-grid .trail { color: #1a6a1a; }
+    .nav-grid .start { color: #4488ff; }
+
+    /* benchmark animated table */
+    .bench-row { display: flex; gap: 0; font-size: 11px; margin-bottom: 2px; opacity: 0; transition: opacity 0.4s; }
+    .bench-row.show { opacity: 1; }
+    .bench-row .seq  { color: #aaffaa; min-width: 110px; }
+    .bench-row .fc   { color: #33ff33; min-width: 64px; }
+    .bench-row .rl   { color: #88ccaa; min-width: 64px; }
+    .bench-row .res  { min-width: 72px; }
+    .bench-row .win  { color: #39d353; }
+    .bench-row .lose { color: #ff5555; }
+
+    /* ── STATUS BAR (Nathan style) ───────────────────────── */
     #sbar {
-      height: 22px; background: #238636;
-      color: #fff; display: flex; align-items: center;
-      padding: 0 12px; font-size: 11px; gap: 14px; flex-shrink: 0;
+      height: 22px; background: #238636; color: #fff;
+      display: flex; align-items: center; padding: 0 12px;
+      font-size: 11px; gap: 14px; flex-shrink: 0;
     }
     #sbar-file { margin-left: auto; }
+
+    /* click pulse */
+    @keyframes clickPulse { 0%{background:rgba(57,211,83,0.3)} 100%{background:transparent} }
+    .click-pulse { animation: clickPulse 0.4s ease-out; }
   </style>
 </head>
 <body>
 
-<!-- ── BOOT ──────────────────────────────────────────── -->
+<!-- ── BOOT SCREEN ────────────────────────────────────── -->
 <div id="boot">
 <pre id="ascii">         ______  __  __  ______  __  __
  /'\_/`\/\  _  \/\ \/\ \/\  _  \/\ \/\ \
@@ -262,7 +275,7 @@
   <div id="boot-log"></div>
 </div>
 
-<!-- ── APP ───────────────────────────────────────────── -->
+<!-- ── MAIN APP ───────────────────────────────────────── -->
 <div id="app">
   <div class="window-chrome">
     <div class="window-controls">
@@ -270,427 +283,594 @@
       <div class="control-dot yellow"></div>
       <div class="control-dot green"></div>
     </div>
-    <div class="window-title" id="win-title">manan_kharwar_v1.sh — EXPLORER</div>
+    <div class="window-title" id="win-title">manan_kharwar_v1.sh   EXPLORER</div>
   </div>
 
   <div class="app-layout">
-    <!-- SIDEBAR -->
     <div class="sidebar">
       <div class="sidebar-header">Explorer</div>
       <div class="file-tree">
-        <div class="root-folder">📁 PORTFOLIO</div>
+        <div class="root-folder">PORTFOLIO</div>
 
-        <div class="file active" onclick="loadPage('about')" id="fi-about">
-          <span class="tree-line">├──</span> 📄 ABOUT_ME.md
-        </div>
+        <div class="file active" id="fi-about" onclick="nav('about')">ABOUT_ME.md</div>
 
-        <!-- PROJECTS folder -->
-        <div class="folder" id="fold-proj" onclick="toggleFolder('proj')">
-          <span class="tree-line">├──</span>
-          <span class="arrow" id="arr-proj">▶</span> 📁 PROJECTS
+        <div class="folder" id="fold-proj" onclick="toggleF('proj')">
+          <span class="arrow" id="arr-proj">&#9654;</span> PROJECTS
         </div>
         <div class="folder-content" id="ch-proj">
-          <div class="file" onclick="loadPage('fc')" id="fi-fc">
-            <span class="tree-line">│  ├──</span> ⚙️ fusioncore.cpp
-          </div>
-          <div class="file" onclick="loadPage('husky')" id="fi-husky">
-            <span class="tree-line">│  ├──</span> 🔌 husky_bringup.yaml
-          </div>
-          <div class="file" onclick="loadPage('nav')" id="fi-nav">
-            <span class="tree-line">│  ├──</span> 🗺️ nav2_bridge.cpp
-          </div>
-          <div class="file" onclick="loadPage('bench')" id="fi-bench">
-            <span class="tree-line">│  └──</span> 📊 nclt_bench.py
-          </div>
+          <div class="file child" id="fi-fc"    onclick="nav('fc')">fusioncore.cpp</div>
+          <div class="file child" id="fi-husky" onclick="nav('husky')">husky_bringup.yaml</div>
+          <div class="file child" id="fi-nav"   onclick="nav('nav')">nav2_bridge.cpp</div>
+          <div class="file child" id="fi-bench" onclick="nav('bench')">nclt_bench.py</div>
         </div>
 
-        <div class="file" onclick="loadPage('contact')" id="fi-contact">
-          <span class="tree-line">├──</span> { } CONTACT.json
+        <div class="folder" id="fold-res" onclick="toggleF('res')">
+          <span class="arrow" id="arr-res">&#9654;</span> RESEARCH
         </div>
-        <div class="file" onclick="alert('Resume — coming soon.')">
-          <span class="tree-line">└──</span> 📄 RESUME.pdf
+        <div class="folder-content" id="ch-res">
+          <div class="file child" id="fi-post"  onclick="nav('post')">fusioncore_post.md</div>
+          <div class="file child" id="fi-notes" onclick="nav('notes')">nclt_notes.txt</div>
         </div>
+
+        <div class="file" id="fi-contact" onclick="nav('contact')">CONTACT.json</div>
+        <div class="file" onclick="alert('Resume coming soon.')">RESUME.pdf</div>
       </div>
     </div>
 
-    <!-- CONTENT -->
-    <div class="content-area" id="content-area">
-      <!-- injected by JS -->
-    </div>
+    <div class="content-area" id="ca"></div>
   </div>
 
   <div id="sbar">
-    <span>⬡ MANAN KHARWAR</span>
+    <span>MANAN KHARWAR</span>
     <span style="opacity:.4">|</span>
-    <span>ROS 2 · C++ · Sensor Fusion</span>
+    <span>ROS 2  C++  Sensor Fusion</span>
     <span id="sbar-file">ABOUT_ME.md</span>
   </div>
 </div>
 
 <script>
-// ── CONTENT DATA ─────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+// PAGE CONTENT
+// ════════════════════════════════════════════════════════════
 const pages = {
 
-  about: {
-    title: 'ABOUT_ME.md',
-    path:  '~/portfolio/ABOUT_ME.md',
-    html: `
-      <div class="page-header">
-        <h1>About Me</h1>
-        <div class="path">~/portfolio/ABOUT_ME.md</div>
-      </div>
-      <p>Hey! I'm <strong>Manan Kharwar</strong> — a robotics software engineer focused on the part of the stack most people gloss over: sensor fusion.</p>
-      <p>I build systems that let robots know where they are. Not the theoretical kind — real robots, outdoors, with cheap GPS and vibrating IMUs and wheel slip. The kind of setup where robot_localization gives you a 20-metre ATE and you have to actually fix it.</p>
-      <p>I'm the author of <strong>FusionCore</strong>, a ROS 2 UKF I started after hitting the same walls one too many times: <code>navsat_transform</code> latency, hand-tuned covariance matrices, no IMU bias estimation. FusionCore handles ECEF GPS natively, estimates bias online, and adapts noise from the innovation sequence automatically. I benchmarked it honestly across six NCLT sequences spanning all four seasons — wins and the one loss both in the table.</p>
-      <p>Beyond FusionCore, I've done hands-on hardware bring-up on Clearpath Husky platforms, wired full Nav2 navigation stacks, and written the tooling to run reproducible benchmarks from bag playback to publication figures.</p>
-      <p>Click through the files on the left to see what I've been building.</p>
+about: {
+  title: 'ABOUT_ME.md',
+  path:  '~/portfolio/ABOUT_ME.md',
+  html: `
+    <div class="page-header">
+      <h1>About Me</h1>
+      <div class="path">~/portfolio/ABOUT_ME.md</div>
+    </div>
+    <p>Hey, I'm <strong>Manan Kharwar</strong> — a robotics software engineer focused on sensor fusion. The kind that works on real robots outdoors, not just in simulation.</p>
+    <p>I build systems that let robots know where they are. IMUs drift. GPS skips. Wheel encoders slip. I wrote <strong>FusionCore</strong> because I got tired of the workarounds everyone uses and decided to fix the problem properly — a 22-state UKF that handles ECEF GPS natively, estimates IMU bias online, and adapts its noise covariance from the data instead of making you tune it by hand.</p>
+    <p>I've also done real hardware bring-up on Clearpath Husky platforms, wired full Nav2 stacks, and run open benchmarks across six outdoor sequences spanning every season. When I report results, I report all of them.</p>
+    <p>Click through the files on the left.</p>
+    <h3>Stack</h3>
+    <div class="tags">
+      <span class="tag green">ROS 2 Jazzy</span>
+      <span class="tag">C++17</span>
+      <span class="tag">Python 3</span>
+      <span class="tag">Eigen3</span>
+      <span class="tag green">UKF / EKF</span>
+      <span class="tag">GNSS / RTK / ECEF</span>
+      <span class="tag">IMU bias estimation</span>
+      <span class="tag">Nav2</span>
+      <span class="tag orange">Clearpath Husky</span>
+      <span class="tag orange">BNO085</span>
+      <span class="tag">Linux / WSL2</span>
+      <span class="tag">CMake / colcon</span>
+    </div>
+  `
+},
 
-      <h3>Stack</h3>
+fc: {
+  title: 'fusioncore.cpp',
+  path:  '~/portfolio/PROJECTS/fusioncore.cpp',
+  html: `
+    <div class="page-header">
+      <h1>FusionCore</h1>
+      <div class="path">~/portfolio/PROJECTS/fusioncore.cpp</div>
+    </div>
+    <div class="project-details">
       <div class="tags">
-        <span class="tag green">ROS 2 Jazzy</span>
-        <span class="tag">C++17</span>
-        <span class="tag">Python 3</span>
-        <span class="tag">Eigen3</span>
-        <span class="tag green">UKF / EKF</span>
-        <span class="tag">GNSS / RTK / ECEF</span>
-        <span class="tag">IMU bias estimation</span>
-        <span class="tag">Nav2</span>
-        <span class="tag orange">Clearpath Husky</span>
-        <span class="tag orange">BNO085</span>
-        <span class="tag">Linux / WSL2</span>
-        <span class="tag">CMake · colcon</span>
+        <span class="tag green">ROS 2 Jazzy</span><span class="tag">C++17</span>
+        <span class="tag green">UKF</span><span class="tag">ECEF GPS</span>
+        <span class="tag">IMU bias estimation</span><span class="tag">100 Hz</span>
+        <span class="tag orange">Apache 2.0</span>
       </div>
-    `
-  },
+      <p>A 22-state UKF that fuses IMU, wheel encoders, and GPS at 100 Hz. No manual noise tuning. ECEF GPS handled natively — no <code>navsat_transform</code>, no UTM zone issues, no extra latency. IMU bias estimated online. Every sensor gated with a chi-squared test.</p>
+      <p><strong>Repo:</strong> <a href="https://github.com/manankharwar/fusioncore" target="_blank">github.com/manankharwar/fusioncore</a></p>
+    </div>
+    <p style="font-size:11px; color:var(--text-secondary); margin-bottom:8px">Live state — click the red button to see benchmark results</p>
+    <div class="retro-computer">
+      <div class="retro-monitor">
+        <div class="retro-screen-frame"><div class="retro-screen">
+          <div class="mon-view active" id="mv-fc-live">
+            <div class="mon-label">FUSIONCORE UKF  /fusion/odom</div>
+            <div class="live-term" id="lt-fc"></div>
+          </div>
+          <div class="mon-view" id="mv-fc-bench">
+            <div class="mon-label">NCLT BENCHMARK RESULTS  ATE RMSE (m)</div>
+            <div id="bench-table"></div>
+          </div>
+        </div></div>
+        <div class="power-button" onclick="toggleMon('fc')"></div>
+      </div>
+      <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+    </div>
+  `
+},
 
-  fc: {
-    title: 'fusioncore.cpp',
-    path:  '~/portfolio/PROJECTS/fusioncore.cpp',
-    html: `
-      <div class="page-header">
-        <h1>FusionCore</h1>
-        <div class="path">~/portfolio/PROJECTS/fusioncore.cpp</div>
+husky: {
+  title: 'husky_bringup.yaml',
+  path:  '~/portfolio/PROJECTS/husky_bringup.yaml',
+  html: `
+    <div class="page-header">
+      <h1>Husky + BNO085 Hardware Bringup</h1>
+      <div class="path">~/portfolio/PROJECTS/husky_bringup.yaml</div>
+    </div>
+    <div class="project-details">
+      <div class="tags">
+        <span class="tag orange">Clearpath Husky</span><span class="tag orange">BNO085</span>
+        <span class="tag green">ROS 2 Jazzy</span><span class="tag">Hardware</span>
+        <span class="tag">IMU calibration</span><span class="tag">YAML config</span>
       </div>
-      <div class="project-details">
-        <div class="tags">
-          <span class="tag green">ROS 2 Jazzy</span>
-          <span class="tag">C++17</span>
-          <span class="tag green">UKF</span>
-          <span class="tag">ECEF GPS</span>
-          <span class="tag">IMU bias estimation</span>
-          <span class="tag">100 Hz</span>
-          <span class="tag orange">Apache 2.0</span>
-        </div>
-        <p>A 22-state Unscented Kalman Filter for mobile robots. Fuses IMU, wheel encoders, and GPS into one position estimate at 100 Hz. Estimates IMU bias online. Adapts noise covariance from the innovation sequence — no hand-tuning required.</p>
-        <p><code>robot_localization</code> is the default ROS answer. It works, but GPS goes through <code>navsat_transform</code> (extra node, latency, UTM zone issues), there's no IMU bias estimation, and covariances need hand-tuning per robot. FusionCore handles ECEF GPS natively and gates every sensor with a chi-squared test.</p>
-        <h3>Key features</h3>
-        <ul>
-          <li><strong>22-state UKF:</strong> Position, velocity, orientation, IMU accel bias, IMU gyro bias — all estimated jointly.</li>
-          <li><strong>Native ECEF GPS:</strong> No coordinate projection, no <code>navsat_transform</code>, no UTM zone boundary issues.</li>
-          <li><strong>Adaptive noise:</strong> Covariance estimated from the innovation sequence. Re-tunes itself as conditions change.</li>
-          <li><strong>Chi-squared gating:</strong> Outlier rejection on every sensor. Configurable per sensor.</li>
-          <li><strong>Inertial coast mode:</strong> Runs on IMU alone when GPS drops. Smooth re-entry when signal returns.</li>
-        </ul>
-        <p><strong>Repo:</strong> <a href="https://github.com/manankharwar/fusioncore" target="_blank">github.com/manankharwar/fusioncore</a></p>
-      </div>
-
-      <div class="retro-computer">
-        <div class="retro-monitor">
-          <div class="retro-screen-frame">
-            <div class="retro-screen">
-              <div class="terminal-loader active" id="tl-fc">
-                <p class="typing-text">> ros2 launch fusioncore fusioncore.launch.py</p>
-                <p>[ INFO] UKF init: 22-state, sigma pts=45</p>
-                <p>[ INFO] GPS fix acquired  HDOP=0.9  sats=12</p>
-                <p>[ INFO] IMU bias est: [0.0003, -0.0011, 0.0007] rad/s</p>
-                <p style="margin-top:auto">[ INFO] Publishing /fusion/odom @ 100 Hz</p>
-              </div>
-              <div class="file-explorer" id="fe-fc">
-                <p style="border-bottom:1px solid #33ff33; padding-bottom:5px; margin-bottom:10px">Directory: ~/fusioncore/benchmarks/nclt/</p>
-                <div class="file-item"><span>[RESULT]</span> Jan 2012 — FC 5.6 m &nbsp; RL 23.5 m &nbsp; FC wins 4.2×</div>
-                <div class="file-item"><span>[RESULT]</span> Feb 2012 — FC 9.7 m &nbsp; RL 20.5 m &nbsp; FC wins 2.1×</div>
-                <div class="file-item"><span>[RESULT]</span> Mar 2012 — FC 4.2 m &nbsp; RL 10.8 m &nbsp; FC wins 2.6×</div>
-                <div class="file-item"><span>[RESULT]</span> Aug 2012 — FC 7.5 m &nbsp; RL  9.4 m &nbsp; FC wins 1.3×</div>
-                <div class="file-item"><span>[RESULT]</span> Nov 2012 — FC 28.7 m &nbsp; RL 10.9 m &nbsp; RL wins 2.6×</div>
-                <div class="file-item"><span>[RESULT]</span> Feb 2013 — FC 4.1 m &nbsp; RL  5.8 m &nbsp; FC wins 1.4×</div>
-                <div class="file-item" onclick="window.open('https://github.com/manankharwar/fusioncore','_blank')"><span>[LINK]</span> github.com/manankharwar/fusioncore</div>
-              </div>
+      <p>End-to-end bring-up for a Clearpath Husky UGV running FusionCore with the BNO085 IMU. Driver config, IMU-to-base-link transform calibration, process noise tuning for Husky ground-contact dynamics. Tested on real hardware.</p>
+      <ul>
+        <li><strong>BNO085 ROS 2 integration:</strong> quaternion validation, gravity subtraction verification</li>
+        <li><strong>Migration guide:</strong> step-by-step RL-EKF to FusionCore, parameter mapping</li>
+        <li><strong>GPS preset YAMLs:</strong> open sky, urban canyon, degraded signal — drop-in configs</li>
+      </ul>
+    </div>
+    <p style="font-size:11px; color:var(--text-secondary); margin-bottom:8px">Live calibration — click the red button to browse config files</p>
+    <div class="retro-computer">
+      <div class="retro-monitor">
+        <div class="retro-screen-frame"><div class="retro-screen">
+          <div class="mon-view active" id="mv-husky-live">
+            <div class="mon-label">BNO085 CALIBRATION SEQUENCE</div>
+            <div class="live-term" id="lt-husky"></div>
+          </div>
+          <div class="mon-view" id="mv-husky-files">
+            <div class="mon-label">~/fusioncore/config/hardware/</div>
+            <div class="mon-files">
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">husky_bno085.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">preset_open_sky.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">preset_urban.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">preset_degraded.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">preset_indoor.yaml</span></div>
+              <div class="mon-file"><span class="ext">[MD]</span><span class="name">migration_guide.md</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">imu_transforms.yaml</span></div>
             </div>
           </div>
-          <div class="power-button" onclick="toggleRetro('fc')"></div>
-        </div>
-        <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+        </div></div>
+        <div class="power-button" onclick="toggleMon('husky')"></div>
       </div>
-    `
-  },
+      <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+    </div>
+  `
+},
 
-  husky: {
-    title: 'husky_bringup.yaml',
-    path:  '~/portfolio/PROJECTS/husky_bringup.yaml',
-    html: `
-      <div class="page-header">
-        <h1>Husky + BNO085 Hardware Bringup</h1>
-        <div class="path">~/portfolio/PROJECTS/husky_bringup.yaml</div>
+nav: {
+  title: 'nav2_bridge.cpp',
+  path:  '~/portfolio/PROJECTS/nav2_bridge.cpp',
+  html: `
+    <div class="page-header">
+      <h1>Nav2 Full Stack Integration</h1>
+      <div class="path">~/portfolio/PROJECTS/nav2_bridge.cpp</div>
+    </div>
+    <div class="project-details">
+      <div class="tags">
+        <span class="tag green">Nav2</span><span class="tag green">ROS 2 Jazzy</span>
+        <span class="tag">TF2</span><span class="tag">C++17</span>
+        <span class="tag">GPS navigation</span><span class="tag">Behaviour Trees</span>
       </div>
-      <div class="project-details">
-        <div class="tags">
-          <span class="tag orange">Clearpath Husky</span>
-          <span class="tag orange">BNO085</span>
-          <span class="tag green">ROS 2 Jazzy</span>
-          <span class="tag">Hardware</span>
-          <span class="tag">IMU calibration</span>
-          <span class="tag">YAML config</span>
-        </div>
-        <p>End-to-end hardware bring-up for a Clearpath Husky UGV running FusionCore on ROS 2 Jazzy with the BNO085 IMU. Covers driver configuration, IMU-to-base-link transform calibration, and process noise tuning for the Husky's ground-contact dynamics.</p>
-        <h3>What it covers</h3>
-        <ul>
-          <li><strong>BNO085 → ROS 2 integration:</strong> Driver config, quaternion output validation, gravity subtraction verification. Confirmed data quality before touching the fusion stack.</li>
-          <li><strong>robot_localization migration guide:</strong> Step-by-step guide for teams moving from RL-EKF to FusionCore — what parameters map to what, what to discard, what to re-tune.</li>
-          <li><strong>Environment preset YAMLs:</strong> GPS quality scenario presets (open sky, urban canyon, degraded signal). Drop-in configs so teams don't retune from scratch per site.</li>
-          <li><strong>Validated on real hardware:</strong> Configs tested on actual Husky platform, not just simulation.</li>
-        </ul>
-      </div>
-
-      <div class="retro-computer">
-        <div class="retro-monitor">
-          <div class="retro-screen-frame">
-            <div class="retro-screen">
-              <div class="terminal-loader active" id="tl-husky">
-                <p class="typing-text">> ros2 launch husky_bringup bno085.launch.py</p>
-                <p>[ INFO] BNO085 driver: connected  /dev/ttyUSB0</p>
-                <p>[ INFO] Quaternion output: validated</p>
-                <p>[ INFO] Gravity vector: subtracted</p>
-                <p style="margin-top:auto">[ INFO] IMU data @ 100 Hz → /imu/data</p>
-              </div>
-              <div class="file-explorer" id="fe-husky">
-                <p style="border-bottom:1px solid #33ff33; padding-bottom:5px; margin-bottom:10px">Directory: ~/fusioncore/config/hardware/</p>
-                <div class="file-item"><span>[YAML]</span> husky_bno085.yaml — IMU driver config</div>
-                <div class="file-item"><span>[YAML]</span> preset_open_sky.yaml — GPS quality: good</div>
-                <div class="file-item"><span>[YAML]</span> preset_urban.yaml — GPS quality: degraded</div>
-                <div class="file-item"><span>[YAML]</span> preset_indoor.yaml — GPS disabled</div>
-                <div class="file-item"><span>[MD]</span> migration_guide.md — RL → FusionCore</div>
-              </div>
+      <p>FusionCore wired into a full Nav2 navigation stack. FusionCore owns the <code>odom → base_link</code> TF transform and publishes <code>/fusion/odom</code> at 100 Hz with correct covariance. Nav2 controller and planner consume it directly. No AMCL, no slam_toolbox needed for GPS-primary environments.</p>
+      <ul>
+        <li><strong>Single launch file:</strong> FusionCore, Nav2 BT navigator, costmaps, controller server</li>
+        <li><strong>Covariance propagation:</strong> FusionCore covariance feeds Nav2 costmap inflation for safety-aware planning</li>
+        <li><strong>Outdoor validated:</strong> campus routes, 100 Hz pose stream, smooth GPS-to-IMU interpolation between fixes</li>
+      </ul>
+    </div>
+    <p style="font-size:11px; color:var(--text-secondary); margin-bottom:8px">Live navigation — click the red button to see launch structure</p>
+    <div class="retro-computer">
+      <div class="retro-monitor">
+        <div class="retro-screen-frame"><div class="retro-screen">
+          <div class="mon-view active" id="mv-nav-live">
+            <div class="mon-label">NAV2 AUTONOMOUS NAVIGATION</div>
+            <div class="live-term" id="lt-nav"></div>
+          </div>
+          <div class="mon-view" id="mv-nav-files">
+            <div class="mon-label">~/fusioncore/launch/</div>
+            <div class="mon-files">
+              <div class="mon-file"><span class="ext">[PY]</span><span class="name">fusioncore_nav2.launch.py</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">nav2_params.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">costmap_local.yaml</span></div>
+              <div class="mon-file"><span class="ext">[YAML]</span><span class="name">costmap_global.yaml</span></div>
+              <div class="mon-file"><span class="ext">[XML]</span><span class="name">navigate_to_pose.xml</span></div>
+              <div class="mon-file"><span class="ext">[XML]</span><span class="name">navigate_through_poses.xml</span></div>
             </div>
           </div>
-          <div class="power-button" onclick="toggleRetro('husky')"></div>
-        </div>
-        <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+        </div></div>
+        <div class="power-button" onclick="toggleMon('nav')"></div>
       </div>
-    `
-  },
+      <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+    </div>
+  `
+},
 
-  nav: {
-    title: 'nav2_bridge.cpp',
-    path:  '~/portfolio/PROJECTS/nav2_bridge.cpp',
-    html: `
-      <div class="page-header">
-        <h1>Nav2 Full Stack Integration</h1>
-        <div class="path">~/portfolio/PROJECTS/nav2_bridge.cpp</div>
+bench: {
+  title: 'nclt_bench.py',
+  path:  '~/portfolio/PROJECTS/nclt_bench.py',
+  html: `
+    <div class="page-header">
+      <h1>NCLT Benchmark Pipeline</h1>
+      <div class="path">~/portfolio/PROJECTS/nclt_bench.py</div>
+    </div>
+    <div class="project-details">
+      <div class="tags">
+        <span class="tag">Python 3</span><span class="tag">evo</span>
+        <span class="tag">matplotlib</span><span class="tag green">ROS 2</span>
+        <span class="tag">NCLT dataset</span><span class="tag">RTK GPS</span>
       </div>
-      <div class="project-details">
-        <div class="tags">
-          <span class="tag green">Nav2</span>
-          <span class="tag green">ROS 2 Jazzy</span>
-          <span class="tag">TF2</span>
-          <span class="tag">C++17</span>
-          <span class="tag">GPS navigation</span>
-          <span class="tag">Behaviour Trees</span>
-        </div>
-        <p>Wired FusionCore into a full Nav2 navigation stack. FusionCore publishes the <code>map → odom → base_link</code> TF chain and a <code>/fusion/odom</code> topic that Nav2's controller and planner consume directly — no AMCL, no slam_toolbox required for GPS-primary environments.</p>
-        <h3>What was involved</h3>
-        <ul>
-          <li><strong>TF chain management:</strong> FusionCore owns the <code>odom → base_link</code> transform. A static <code>map → odom</code> identity bridge satisfies Nav2's localization assumption.</li>
-          <li><strong>Single launch file:</strong> <code>fusioncore_nav2.launch.py</code> brings up FusionCore, Nav2 BT navigator, costmaps, and the controller server in one command.</li>
-          <li><strong>Outdoor validation:</strong> Tested on outdoor campus routes. GPS provides global position; wheel + IMU interpolate smoothly between GPS updates. Nav2 receives a 100 Hz pose stream with correct covariance.</li>
-          <li><strong>Costmap integration:</strong> Properly propagates FusionCore covariance into the Nav2 costmap inflation layer for safety-aware path planning.</li>
-        </ul>
-      </div>
-
-      <div class="retro-computer">
-        <div class="retro-monitor">
-          <div class="retro-screen-frame">
-            <div class="retro-screen">
-              <div class="terminal-loader active" id="tl-nav">
-                <p class="typing-text">> ros2 launch fusioncore fusioncore_nav2.launch.py</p>
-                <p>[ INFO] FusionCore: /fusion/odom @ 100 Hz</p>
-                <p>[ INFO] TF: map → odom → base_link  OK</p>
-                <p>[ INFO] Nav2 BT navigator: active</p>
-                <p style="margin-top:auto">[ INFO] NavigateToPose: goal accepted</p>
-              </div>
-              <div class="file-explorer" id="fe-nav">
-                <p style="border-bottom:1px solid #33ff33; padding-bottom:5px; margin-bottom:10px">Directory: ~/fusioncore/launch/</p>
-                <div class="file-item"><span>[PY]</span> fusioncore_nav2.launch.py</div>
-                <div class="file-item"><span>[YAML]</span> nav2_params.yaml — planner + controller</div>
-                <div class="file-item"><span>[YAML]</span> costmap_params.yaml — local + global</div>
-                <div class="file-item"><span>[XML]</span> navigate_to_pose.xml — behaviour tree</div>
-              </div>
+      <p>Fully reproducible pipeline for benchmarking mobile robot localization on the NCLT dataset. Six sequences across all four seasons, RTK GPS as ground truth. Reports every sequence including the loss. RL runs with Mahalanobis gating enabled — the fairest possible comparison.</p>
+      <ul>
+        <li>ROS 2 bag playback at 3x speed</li>
+        <li>FusionCore + RL-EKF simultaneously, same bag</li>
+        <li>TUM format trajectory extraction, <code>evo_ape</code> ATE evaluation, SE3 alignment</li>
+        <li>Publication-quality matplotlib figures generated automatically</li>
+      </ul>
+    </div>
+    <p style="font-size:11px; color:var(--text-secondary); margin-bottom:8px">Evaluation running — click the red button to browse pipeline tools</p>
+    <div class="retro-computer">
+      <div class="retro-monitor">
+        <div class="retro-screen-frame"><div class="retro-screen">
+          <div class="mon-view active" id="mv-bench-live">
+            <div class="mon-label">NCLT EVALUATION  evo_ape</div>
+            <div class="live-term" id="lt-bench"></div>
+          </div>
+          <div class="mon-view" id="mv-bench-files">
+            <div class="mon-label">~/fusioncore/tools/</div>
+            <div class="mon-files">
+              <div class="mon-file"><span class="ext">[PY]</span><span class="name">evaluate.py</span></div>
+              <div class="mon-file"><span class="ext">[PY]</span><span class="name">make_figures.py</span></div>
+              <div class="mon-file"><span class="ext">[PY]</span><span class="name">odom_to_tum.py</span></div>
+              <div class="mon-file"><span class="ext">[PY]</span><span class="name">nclt_rtk_to_tum.py</span></div>
+              <div class="mon-file"><span class="ext">[MD]</span><span class="name">benchmarks/README.md</span></div>
+              <div class="mon-file"><span class="ext">[PNG]</span><span class="name">figures/fig1_bar_chart.png</span></div>
+              <div class="mon-file"><span class="ext">[PNG]</span><span class="name">figures/fig2_traj_grid.png</span></div>
             </div>
           </div>
-          <div class="power-button" onclick="toggleRetro('nav')"></div>
-        </div>
-        <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+        </div></div>
+        <div class="power-button" onclick="toggleMon('bench')"></div>
       </div>
-    `
-  },
+      <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
+    </div>
+  `
+},
 
-  bench: {
-    title: 'nclt_bench.py',
-    path:  '~/portfolio/PROJECTS/nclt_bench.py',
-    html: `
-      <div class="page-header">
-        <h1>NCLT Benchmark Pipeline</h1>
-        <div class="path">~/portfolio/PROJECTS/nclt_bench.py</div>
-      </div>
-      <div class="project-details">
-        <div class="tags">
-          <span class="tag">Python 3</span>
-          <span class="tag">evo</span>
-          <span class="tag">matplotlib</span>
-          <span class="tag green">ROS 2</span>
-          <span class="tag">NCLT dataset</span>
-          <span class="tag">RTK GPS</span>
-        </div>
-        <p>A fully reproducible pipeline for benchmarking mobile robot localization on the NCLT dataset. Six sequences across all four seasons, RTK GPS as ground truth. Reports every sequence — including the one FusionCore loses.</p>
-        <p>The RL comparison uses Mahalanobis gating enabled (chi²(2, 0.999) → threshold 3.72 for GPS, 4.03 for odometry). The gate had no effect on any of the six sequences — confirming the original comparison was already fair.</p>
-        <h3>Pipeline</h3>
-        <ul>
-          <li>ROS 2 bag playback at 3× speed</li>
-          <li>FusionCore + RL-EKF run simultaneously, recording to the same bag</li>
-          <li>TUM trajectory files extracted from bag topics</li>
-          <li><code>evo_ape</code> ATE evaluation with SE3 alignment</li>
-          <li>Publication-quality matplotlib figures generated automatically</li>
-        </ul>
-      </div>
+post: {
+  title: 'fusioncore_post.md',
+  path:  '~/portfolio/RESEARCH/fusioncore_post.md',
+  html: `
+    <div class="page-header">
+      <h1>FusionCore vs robot_localization: 6-sequence NCLT benchmark</h1>
+      <div class="path">~/portfolio/RESEARCH/fusioncore_post.md</div>
+    </div>
+    <div class="research-details">
+      <p style="color:var(--text-secondary); font-size:11px">Published: ROS Discourse, April 2026</p>
+      <p>I wanted an honest answer to "how much better is a well-implemented UKF than RL-EKF when everything else is held equal?" So I built a fully reproducible benchmark: same sensor pipeline, same topics, same config, six outdoor sequences spanning winter, spring, summer, and fall. RL ran with Mahalanobis gating enabled.</p>
+      <p>FusionCore wins on five of six sequences — by 1.3x to 4.2x. The one loss is November 2012, a degraded-GPS season. RL's lack of a rejection gate lets it self-correct faster when GPS is noisy but consistent. FusionCore's gate holds the noise out longer — which backfires when the noise is real signal drift rather than a true outlier.</p>
+      <p>The honest takeaway: adaptive noise estimation and ECEF GPS handling are the main drivers of the gap. The November sequence tells you the limits of chi-squared gating when noise characteristics change slowly.</p>
+      <h3>Key results</h3>
+      <p style="font-size:12px; color:var(--text-secondary)">FC wins 5/6. Average improvement on winning sequences: 2.5x. One honest loss on degraded GPS.</p>
+    </div>
+  `
+},
 
-      <div class="retro-computer">
-        <div class="retro-monitor">
-          <div class="retro-screen-frame">
-            <div class="retro-screen">
-              <div class="terminal-loader active" id="tl-bench">
-                <p class="typing-text">> python3 tools/evaluate.py --sequence 2012-01-08</p>
-                <p>[ INFO] Syncing trajectories (max_diff=1.0s)</p>
-                <p>[ INFO] SE3 alignment: 2048 pairs</p>
-                <p>[ INFO] FC  ATE RMSE:  5.633 m</p>
-                <p style="margin-top:auto">[ INFO] RL  ATE RMSE: 23.487 m  → FC wins 4.2×</p>
-              </div>
-              <div class="file-explorer" id="fe-bench">
-                <p style="border-bottom:1px solid #33ff33; padding-bottom:5px; margin-bottom:10px">Directory: ~/fusioncore/tools/</p>
-                <div class="file-item"><span>[PY]</span> evaluate.py — ATE computation</div>
-                <div class="file-item"><span>[PY]</span> make_figures.py — bar chart + traj grid</div>
-                <div class="file-item"><span>[PY]</span> odom_to_tum.py — bag → TUM extractor</div>
-                <div class="file-item"><span>[PY]</span> nclt_rtk_to_tum.py — RTK GPS → TUM</div>
-                <div class="file-item"><span>[MD]</span> benchmarks/README.md — full methodology</div>
-              </div>
-            </div>
-          </div>
-          <div class="power-button" onclick="toggleRetro('bench')"></div>
-        </div>
-        <div class="retro-base"><div class="vent"></div><div class="vent"></div></div>
-      </div>
-    `
-  },
+notes: {
+  title: 'nclt_notes.txt',
+  path:  '~/portfolio/RESEARCH/nclt_notes.txt',
+  html: `
+    <div class="page-header">
+      <h1>NCLT Benchmark Methodology Notes</h1>
+      <div class="path">~/portfolio/RESEARCH/nclt_notes.txt</div>
+    </div>
+    <div class="research-details">
+      <p style="color:var(--text-secondary); font-size:11px">Internal technical notes</p>
+      <h3>Ground truth</h3>
+      <p>RTK GPS from the NCLT dataset. Clipped to the time window each filter actually ran over — the full GT session is 90 minutes but the benchmark runs 200s at 3x speed.</p>
+      <h3>Trajectory alignment</h3>
+      <p>SE3 alignment computed from synced timestamp pairs (max_diff=1.0s). Transform applied to the full estimated trajectory, not just the synced subset. Avoids biasing the ATE estimate toward the synced window.</p>
+      <h3>RL fairness</h3>
+      <p>RL-EKF runs with Mahalanobis gating enabled: chi2(2, 0.999) = 13.82, threshold = sqrt(13.82) = 3.72 for GPS (2 DOF). chi2(3, 0.999) = 16.27, threshold = 4.03 for wheel odometry (3 DOF). Gate had zero effect on any of the six sequences — original comparison was already fair.</p>
+      <h3>UKF-vs-EKF note</h3>
+      <p>RL also ships a UKF. It diverges on all six sequences with NaN at t=18-31s. Root cause: S matrix initialized to zero and accumulated from sigma points before R is added — produces a singular update on the first GPS measurement.</p>
+    </div>
+  `
+},
 
-  contact: {
-    title: 'CONTACT.json',
-    path:  '~/portfolio/CONTACT.json',
-    html: `
-      <div class="page-header">
-        <h1>Contact</h1>
-        <div class="path">~/portfolio/CONTACT.json</div>
-      </div>
-      <div style="margin-top:22px; font-family:'Fira Code',monospace; font-size:13px; line-height:2.1">
-        <span style="color:var(--text-secondary)">{</span><br>
-        &nbsp;&nbsp;<span style="color:#9cdcfe">"name"</span><span style="color:var(--text-secondary)">:</span> <span style="color:#ce9178">"Manan Kharwar"</span><span style="color:var(--text-secondary)">,</span><br>
-        &nbsp;&nbsp;<span style="color:#9cdcfe">"github"</span><span style="color:var(--text-secondary)">:</span> <span style="color:var(--accent-blue); cursor:pointer" onclick="window.open('https://github.com/manankharwar','_blank')">"github.com/manankharwar"</span><span style="color:var(--text-secondary)">,</span><br>
-        &nbsp;&nbsp;<span style="color:#9cdcfe">"linkedin"</span><span style="color:var(--text-secondary)">:</span> <span style="color:var(--accent-blue); cursor:pointer" onclick="window.open('https://linkedin.com/in/manankharwar','_blank')">"linkedin.com/in/manankharwar"</span><span style="color:var(--text-secondary)">,</span><br>
-        &nbsp;&nbsp;<span style="color:#9cdcfe">"open_to"</span><span style="color:var(--text-secondary)">:</span> [<span style="color:#ce9178">"robotics engineering"</span><span style="color:var(--text-secondary)">,</span> <span style="color:#ce9178">"sensor fusion"</span><span style="color:var(--text-secondary)">,</span> <span style="color:#ce9178">"collaboration"</span>]<span style="color:var(--text-secondary)">,</span><br>
-        &nbsp;&nbsp;<span style="color:#9cdcfe">"contact_via"</span><span style="color:var(--text-secondary)">:</span> <span style="color:#ce9178">"GitHub issues or discussions"</span><br>
-        <span style="color:var(--text-secondary)">}</span>
-      </div>
-    `
-  }
-};
+contact: {
+  title: 'CONTACT.json',
+  path:  '~/portfolio/CONTACT.json',
+  html: `
+    <div class="page-header">
+      <h1>Contact</h1>
+      <div class="path">~/portfolio/CONTACT.json</div>
+    </div>
+    <div style="margin-top:22px; font-family:'Fira Code',monospace; font-size:13px; line-height:2.2">
+      <span style="color:var(--text-secondary)">{</span><br>
+      &nbsp;&nbsp;<span style="color:#9cdcfe">"name"</span><span style="color:var(--text-secondary)">:</span> <span style="color:#ce9178">"Manan Kharwar"</span><span style="color:var(--text-secondary)">,</span><br>
+      &nbsp;&nbsp;<span style="color:#9cdcfe">"github"</span><span style="color:var(--text-secondary)">:</span> <span style="color:var(--accent-blue); cursor:pointer" onclick="window.open('https://github.com/manankharwar','_blank')">"github.com/manankharwar"</span><span style="color:var(--text-secondary)">,</span><br>
+      &nbsp;&nbsp;<span style="color:#9cdcfe">"linkedin"</span><span style="color:var(--text-secondary)">:</span> <span style="color:var(--accent-blue); cursor:pointer" onclick="window.open('https://linkedin.com/in/manankharwar','_blank')">"linkedin.com/in/manankharwar"</span><span style="color:var(--text-secondary)">,</span><br>
+      &nbsp;&nbsp;<span style="color:#9cdcfe">"open_to"</span><span style="color:var(--text-secondary)">:</span> [<span style="color:#ce9178">"robotics engineering"</span><span style="color:var(--text-secondary)">,</span> <span style="color:#ce9178">"sensor fusion"</span><span style="color:var(--text-secondary)">,</span> <span style="color:#ce9178">"collaboration"</span>]<span style="color:var(--text-secondary)">,</span><br>
+      &nbsp;&nbsp;<span style="color:#9cdcfe">"contact_via"</span><span style="color:var(--text-secondary)">:</span> <span style="color:#ce9178">"GitHub issues or discussions"</span><br>
+      <span style="color:var(--text-secondary)">}</span>
+    </div>
+  `
+}
 
-// ── BOOT ────────────────────────────────────────────────────────
+}; // end pages
+
+// ════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════
 const BOOT = [
   { cmd: 'boot --portfolio manan_kharwar_v1' },
-  { cmd: 'mount /home/manan/portfolio', out: '  OK  read-write' },
+  { cmd: 'mount /home/manan/portfolio',            out: '  OK  read-write' },
   { cmd: 'load ros2_jazzy fusioncore_core eigen3', out: '  OK  modules loaded' },
-  { cmd: 'calibrate imu --online', out: '  OK  bias=[0.0003,-0.0011,0.0007] rad/s' },
-  { cmd: 'gps --fix --rtk', out: '  OK  HDOP=0.9  acc=0.3m  sats=12' },
-  { cmd: 'init ui --theme github-dark', out: '  OK  renderer ready' },
-  { cmd: 'echo "System ready."' },
+  { cmd: 'calibrate imu --online',                 out: '  OK  bias=[0.0003,-0.0011,0.0007]' },
+  { cmd: 'gps --fix --rtk',                        out: '  OK  HDOP=0.9  acc=0.3m  sats=12' },
+  { cmd: 'init ui --theme github-dark',            out: '  OK  renderer ready' },
+  { cmd: 'echo "Ready."' },
 ];
 
 const blog = document.getElementById('boot-log');
-
-function mkbl(cfg) {
+function mkbl(c) {
   const d = document.createElement('div');
   d.className = 'bl';
-  let h = `<span class="u">manan@portfolio</span><span class="s">:</span><span class="h">~</span><span class="s">$</span> ${cfg.cmd}`;
-  if (cfg.out) h += `\n<span class="ok">${cfg.out}</span>`;
-  d.innerHTML = h;
-  return d;
+  let h = `<span class="u">manan@portfolio</span><span class="s">:</span><span class="h">~</span><span class="s">$</span> ${c.cmd}`;
+  if (c.out) h += `\n<span class="ok">${c.out}</span>`;
+  d.innerHTML = h; return d;
 }
-
 setTimeout(() => document.getElementById('ascii').classList.add('show'), 80);
-
-BOOT.forEach((cfg, i) => {
+BOOT.forEach((c, i) => {
   setTimeout(() => {
-    const el = mkbl(cfg);
-    blog.appendChild(el);
+    const el = mkbl(c); blog.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
   }, 500 + i * 300);
 });
-
-const done = 500 + BOOT.length * 300 + 500;
 setTimeout(() => {
   const b = document.getElementById('boot');
   b.classList.add('out');
-  setTimeout(() => {
-    b.style.display = 'none';
-    document.getElementById('app').classList.add('on');
-    loadPage('about');
-  }, 650);
-}, done);
+  setTimeout(() => { b.style.display = 'none'; document.getElementById('app').classList.add('on'); nav('about'); }, 650);
+}, 500 + BOOT.length * 300 + 500);
 
-// ── NAV ─────────────────────────────────────────────────────────
-const FILE_IDS = { about:'fi-about', fc:'fi-fc', husky:'fi-husky', nav:'fi-nav', bench:'fi-bench', contact:'fi-contact' };
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+const FILE_IDS = { about:'fi-about', fc:'fi-fc', husky:'fi-husky', nav:'fi-nav', bench:'fi-bench', post:'fi-post', notes:'fi-notes', contact:'fi-contact' };
 let current = null;
+let timers = [];
 
-function loadPage(id) {
+function clearTimers() { timers.forEach(clearInterval); timers = []; }
+
+function nav(id) {
+  clearTimers();
   if (current && FILE_IDS[current]) document.getElementById(FILE_IDS[current])?.classList.remove('active');
   current = id;
-  const pg = pages[id];
-  if (!pg) return;
-
-  document.getElementById('content-area').innerHTML = pg.html;
-  document.getElementById('win-title').textContent = `${pg.title} — manan_kharwar_v1.sh EXPLORER`;
+  const pg = pages[id]; if (!pg) return;
+  document.getElementById('ca').innerHTML = pg.html;
+  document.getElementById('win-title').textContent = `${pg.title}   manan_kharwar_v1.sh EXPLORER`;
   document.getElementById('sbar-file').textContent = pg.title;
-  document.getElementById('content-area').scrollTop = 0;
-
+  document.getElementById('ca').scrollTop = 0;
   if (FILE_IDS[id]) document.getElementById(FILE_IDS[id])?.classList.add('active');
+  initMonitor(id);
 }
 
-const folderOpen = {};
-function toggleFolder(id) {
-  folderOpen[id] = !folderOpen[id];
-  const ch = document.getElementById('ch-' + id);
-  const arr = document.getElementById('arr-' + id);
-  ch.classList.toggle('open', folderOpen[id]);
-  arr.textContent = folderOpen[id] ? '▼' : '▶';
-  const fold = document.getElementById('fold-' + id);
-  fold?.classList.toggle('active', folderOpen[id]);
+const foldState = {};
+function toggleF(id) {
+  foldState[id] = !foldState[id];
+  document.getElementById('ch-' + id).classList.toggle('open', foldState[id]);
+  document.getElementById('arr-' + id).innerHTML = foldState[id] ? '&#9660;' : '&#9654;';
+  document.getElementById('fold-' + id)?.classList.toggle('active', foldState[id]);
 }
 
-// power button toggles terminal ↔ file explorer inside retro monitor
-function toggleRetro(key) {
-  const tl = document.getElementById('tl-' + key);
-  const fe = document.getElementById('fe-' + key);
-  if (!tl || !fe) return;
-  const showFE = !fe.classList.contains('active');
-  tl.classList.toggle('active', !showFE);
-  fe.classList.toggle('active', showFE);
+const monState = {}; // true = files view
+function toggleMon(key) {
+  monState[key] = !monState[key];
+  const live  = document.getElementById('mv-' + key + '-live')  || document.getElementById('mv-' + key + '-live');
+  const alt   = document.getElementById('mv-' + key + '-bench') || document.getElementById('mv-' + key + '-files');
+  if (!live || !alt) return;
+  live.classList.toggle('active', !monState[key]);
+  alt.classList.toggle('active',   monState[key]);
+  if (key === 'fc' && monState[key]) runBenchReveal();
+}
+
+// ════════════════════════════════════════════════════════════
+// MONITOR ANIMATIONS
+// ════════════════════════════════════════════════════════════
+
+function initMonitor(id) {
+  if (id === 'fc')    startFCMonitor();
+  if (id === 'husky') startHuskyMonitor();
+  if (id === 'nav')   startNavMonitor();
+  if (id === 'bench') startBenchMonitor();
+}
+
+// ── FusionCore: live UKF state ──────────────────────────────
+function startFCMonitor() {
+  let t = 0;
+  const state = { x:12.341, y:8.927, yaw:0.421, vx:0.834, vy:0.013, bax:0.0003, bay:-0.0011, baz:0.0007, bgx:0.00012, hz:100.0, inno:0.043 };
+  function rnd(v, d, scale) { return (v + (Math.random()-0.5)*scale).toFixed(d); }
+  function bar(v, max, w) {
+    const n = Math.round(v/max*w);
+    return '<span class="bar">' + '#'.repeat(Math.min(n,w)) + '<span class="dim">' + '.'.repeat(Math.max(0,w-n)) + '</span></span>';
+  }
+
+  function update() {
+    const el = document.getElementById('lt-fc'); if (!el) return;
+    t += 0.01;
+    state.x   += (Math.random()-0.5)*0.004;
+    state.y   += (Math.random()-0.5)*0.004;
+    state.yaw += (Math.random()-0.5)*0.001;
+    state.vx  += (Math.random()-0.5)*0.002;
+    state.inno = Math.abs((Math.random()-0.5)*0.09 + 0.04);
+    const gpsQ = 0.88 + Math.sin(t)*0.08;
+    const inGate = state.inno < 0.12;
+    el.innerHTML =
+`<span class="dim">STATE VECTOR                    SENSOR HEALTH</span>
+pos.x    <span class="hi">${state.x.toFixed(3).padStart(8)} m</span>    GPS  ${bar(gpsQ,1,10)} <span class="hi">${(gpsQ*100).toFixed(0)}%</span>
+pos.y    <span class="hi">${state.y.toFixed(3).padStart(8)} m</span>    IMU  ${bar(0.99,1,10)} <span class="hi">99%</span>
+yaw      <span class="hi">${state.yaw.toFixed(4).padStart(8)} r</span>    WHL  ${bar(0.95,1,10)} <span class="hi">95%</span>
+vel.x    <span class="hi">${state.vx.toFixed(3).padStart(8)} m/s</span>
+vel.y    <span class="hi">${state.vy.toFixed(3).padStart(8)} m/s</span>  <span class="dim">INNOVATION</span>
+bias.ax  <span class="dim">${state.bax.toFixed(4).padStart(8)}</span>    <span class="${inGate ? 'hi' : 'warn'}">${state.inno.toFixed(4).padStart(6)}  ${inGate ? 'IN GATE' : 'OUTLIER'}</span>
+bias.ay  <span class="dim">${state.bay.toFixed(4).padStart(8)}</span>
+bias.gy  <span class="dim">${state.bgx.toFixed(5).padStart(8)}</span>  <span class="dim">PUBLISH</span>
+                        <span class="hi">/fusion/odom  ${state.hz.toFixed(1)} Hz</span>`;
+  }
+  update();
+  timers.push(setInterval(update, 900));
+}
+
+// ── Husky: calibration sequence ─────────────────────────────
+function startHuskyMonitor() {
+  let phase = 0, prog = { gyro:0, accel:0, mag:0 };
+  const bias = { gx:0.0003, gy:-0.0011, gz:0.0007, ax:0.024, ay:-0.011, az:9.807 };
+  function bar(v, w) {
+    const n = Math.round(v/100*w);
+    return '<span class="bar">' + '#'.repeat(Math.min(n,w)) + '<span class="dim">' + '.'.repeat(Math.max(0,w-n)) + '</span></span>';
+  }
+  function rnd(v) { return (v + (Math.random()-0.5)*0.0001).toFixed(4); }
+
+  function update() {
+    const el = document.getElementById('lt-husky'); if (!el) return;
+    if (prog.gyro  < 100) prog.gyro  = Math.min(100, prog.gyro  + (8 + Math.random()*6));
+    if (prog.accel < 100) prog.accel = Math.min(100, prog.accel + (7 + Math.random()*5));
+    if (prog.mag   < 100) prog.mag   = Math.min(100, prog.mag   + (6 + Math.random()*7));
+    const hdop = Math.max(0.9, 2.8 - (prog.accel/100)*1.9 + (Math.random()-0.5)*0.1);
+    const sats = Math.min(12, Math.round((prog.accel/100)*7 + 5));
+    const done = prog.gyro===100 && prog.accel===100 && prog.mag===100;
+    el.innerHTML =
+`<span class="dim">BNO085  /dev/ttyUSB0  100 Hz</span>
+
+gyro  bias   ${bar(prog.gyro,12)}  <span class="${prog.gyro===100?'hi':'warn'}">${prog.gyro.toFixed(0).padStart(3)}%</span>
+             <span class="dim">[${rnd(bias.gx)}, ${rnd(bias.gy)}, ${rnd(bias.gz)}] rad/s</span>
+
+accel bias   ${bar(prog.accel,12)}  <span class="${prog.accel===100?'hi':'warn'}">${prog.accel.toFixed(0).padStart(3)}%</span>
+             <span class="dim">[${rnd(bias.ax)}, ${rnd(bias.ay)}, ${rnd(bias.az)}] m/s²</span>
+
+GPS fix      ${bar(prog.mag,12)}  <span class="${prog.mag===100?'hi':'warn'}">${prog.mag.toFixed(0).padStart(3)}%</span>
+             HDOP <span class="hi">${hdop.toFixed(2)}</span>  sats <span class="hi">${sats}</span>
+
+<span class="${done?'hi':'dim'}">${done ? 'CALIBRATION COMPLETE  /imu/data ready' : 'calibrating...'}</span>`;
+  }
+  update();
+  timers.push(setInterval(update, 700));
+}
+
+// ── Nav2: ASCII robot navigation ─────────────────────────────
+function startNavMonitor() {
+  const W = 11, H = 7;
+  const walls = [[1,3],[1,4],[2,3],[3,3],[3,7],[4,7],[2,8],[3,8]];
+  const path  = [[6,1],[5,1],[5,2],[5,3],[4,3],[4,4],[3,4],[3,5],[2,5],[2,6],[1,6],[1,7],[0,7],[0,8],[0,9],[0,10]];
+  const goal  = path[path.length-1];
+  const start = path[0];
+  let step = 0, trail = new Set();
+
+  function isWall(r,c) { return walls.some(w=>w[0]===r&&w[1]===c); }
+
+  function update() {
+    const el = document.getElementById('lt-nav'); if (!el) return;
+    const robot = path[step % path.length];
+    trail.add(`${robot[0]},${robot[1]}`);
+    step++;
+    if (step >= path.length) { step = 0; trail.clear(); }
+
+    let grid = '';
+    for (let r = 0; r < H; r++) {
+      for (let c = 0; c < W; c++) {
+        const k = `${r},${c}`;
+        if (r===robot[0] && c===robot[1])     grid += '<span class="robot">R</span> ';
+        else if (r===goal[0]&&c===goal[1])    grid += '<span class="goal">G</span> ';
+        else if (r===start[0]&&c===start[1])  grid += '<span class="start">S</span> ';
+        else if (isWall(r,c))                 grid += '<span class="wall">#</span> ';
+        else if (trail.has(k))                grid += '<span class="trail">.</span> ';
+        else grid += '<span class="dim">.</span> ';
+      }
+      grid += '\n';
+    }
+    const dist = Math.sqrt(Math.pow(robot[0]-goal[0],2)+Math.pow(robot[1]-goal[1],2)).toFixed(1);
+    el.innerHTML = `<div class="nav-grid">${grid}</div>
+<span class="dim">S=start  R=robot  G=goal  #=wall</span>
+<span class="hi">dist_to_goal ${dist} m   /fusion/odom 100 Hz</span>
+<span class="dim">planner DWB  costmap 0.05m/cell</span>`;
+  }
+  update();
+  timers.push(setInterval(update, 650));
+}
+
+// ── Benchmark: rolling evaluation ────────────────────────────
+const SEQS = [
+  { name:'2012-01-08', fc:5.633,  rl:23.487, win:true  },
+  { name:'2012-02-04', fc:9.651,  rl:20.530, win:true  },
+  { name:'2012-03-31', fc:4.209,  rl:10.786, win:true  },
+  { name:'2012-08-20', fc:7.451,  rl:9.448,  win:true  },
+  { name:'2012-11-04', fc:28.687, rl:10.901, win:false },
+  { name:'2013-02-23', fc:4.124,  rl:5.832,  win:true  },
+];
+
+function startBenchMonitor() {
+  let seqIdx = 0, charIdx = 0, lines = [], showingResult = false;
+
+  const evalLines = (s) => [
+    `> evo_ape tum ${s.name}/ground_truth.tum \\`,
+    `       ${s.name}/fusioncore.tum`,
+    `syncing trajectories  max_diff=1.0s`,
+    `SE3 alignment  pairs=${1800+Math.round(Math.random()*400)}`,
+    `FC  ATE RMSE  ${s.fc.toFixed(3).padStart(7)} m`,
+    `RL  ATE RMSE  ${s.rl.toFixed(3).padStart(7)} m`,
+    s.win ? `RESULT  FC wins  ${(s.rl/s.fc).toFixed(1)}x` : `RESULT  RL wins  ${(s.fc/s.rl).toFixed(1)}x`,
+    ``,
+  ];
+
+  function update() {
+    const el = document.getElementById('lt-bench'); if (!el) return;
+    if (seqIdx >= SEQS.length) { seqIdx = 0; lines = []; charIdx = 0; }
+    const s = SEQS[seqIdx];
+    const allLines = evalLines(s);
+    if (charIdx >= allLines.length) { seqIdx++; charIdx = 0; return; }
+    lines.push(allLines[charIdx++]);
+    if (lines.length > 14) lines.shift();
+    el.innerHTML = lines.map((l, i) => {
+      if (l.startsWith('RESULT')) {
+        const win = l.includes('FC wins');
+        return `<span class="${win?'hi':'warn'}">${l}</span>`;
+      }
+      if (l.startsWith('FC ') || l.startsWith('RL ')) return `<span class="hi">${l}</span>`;
+      if (l.startsWith('>')) return `<span class="dim">${l}</span>`;
+      return `<span class="dim">${l}</span>`;
+    }).join('\n');
+  }
+  timers.push(setInterval(update, 280));
+}
+
+function runBenchReveal() {
+  const container = document.getElementById('bench-table'); if (!container) return;
+  container.innerHTML = `
+    <div class="bench-row show" style="color:var(--text-secondary); font-size:10px; margin-bottom:6px">
+      <span class="seq">SEQUENCE</span><span class="fc">FC</span><span class="rl">RL</span><span class="res">RESULT</span>
+    </div>`;
+  SEQS.forEach((s, i) => {
+    setTimeout(() => {
+      const row = document.createElement('div');
+      row.className = 'bench-row';
+      row.innerHTML = `<span class="seq">${s.name}</span><span class="fc">${s.fc.toFixed(1)} m</span><span class="rl">${s.rl.toFixed(1)} m</span><span class="res ${s.win?'win':'lose'}">${s.win?'FC '+((s.rl/s.fc).toFixed(1))+'x':'RL '+((s.fc/s.rl).toFixed(1))+'x'}</span>`;
+      container.appendChild(row);
+      requestAnimationFrame(() => requestAnimationFrame(() => row.classList.add('show')));
+    }, i * 320);
+  });
 }
 </script>
 </body>
