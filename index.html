@@ -8,347 +8,298 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:        #0d0d0d;
-      --bg2:       #111111;
-      --bg3:       #1a1a1a;
-      --border:    #252525;
-      --green:     #00ff41;
-      --green-dim: #00cc33;
-      --green-dark:#003a10;
-      --amber:     #e8c97a;
-      --blue:      #4fc1ff;
-      --red:       #ff5f57;
-      --muted:     #555555;
-      --text:      #cccccc;
-      --text-dim:  #888888;
+      --bg:       #0d0d0d;
+      --bg2:      #141414;
+      --bg3:      #1e1e1e;
+      --border:   #2a2a2a;
+      --green:    #00ff41;
+      --gdim:     #00cc33;
+      --gdark:    #003b0e;
+      --amber:    #e8c97a;
+      --blue:     #4fc1ff;
+      --muted:    #555;
+      --text:     #d4d4d4;
+      --textdim:  #888;
     }
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--green);
-      font-family: 'Courier New', 'Lucida Console', monospace;
-      font-size: 13px;
-      overflow: hidden;
-    }
+    html, body { height: 100%; background: var(--bg); color: var(--green);
+      font-family: 'Courier New', 'Lucida Console', monospace; font-size: 13px;
+      overflow: hidden; }
 
-    /* ── BOOT SCREEN ───────────────────────────────────────────── */
+    /* ─── BOOT ──────────────────────────────────────────────── */
     #boot {
-      position: fixed; inset: 0;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 0 12vw;
-      z-index: 999;
-      transition: opacity 0.7s ease;
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      z-index: 999; transition: opacity 0.7s ease;
     }
-
-    #boot.fade-out { opacity: 0; pointer-events: none; }
+    #boot.out { opacity: 0; pointer-events: none; }
 
     #ascii {
-      white-space: pre;
-      font-size: 10px;
-      line-height: 1.15;
-      color: var(--green);
-      margin-bottom: 28px;
-      opacity: 0;
-      transition: opacity 0.6s ease;
+      white-space: pre; font-size: 9.5px; line-height: 1.18;
+      color: var(--green); margin-bottom: 32px;
+      opacity: 0; transition: opacity 0.5s ease;
+      text-align: left;
     }
     #ascii.show { opacity: 1; }
 
-    #boot-log { display: flex; flex-direction: column; gap: 3px; }
+    #boot-log { width: 540px; display: flex; flex-direction: column; gap: 3px; }
 
-    .boot-line {
-      color: var(--text-dim);
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 0.25s ease, transform 0.25s ease;
+    .bl {
+      opacity: 0; transform: translateY(3px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      color: var(--textdim); white-space: pre;
     }
-    .boot-line.show { opacity: 1; transform: none; }
-    .boot-line .ps1-user  { color: var(--green-dim); }
-    .boot-line .ps1-sep   { color: var(--muted); }
-    .boot-line .ps1-dir   { color: var(--blue); }
-    .boot-line .ps1-cmd   { color: var(--text); }
-    .boot-line .ok        { color: var(--green); }
-    .boot-line .warn      { color: var(--amber); }
+    .bl.show { opacity: 1; transform: none; }
+    .bl .u { color: var(--gdim); }
+    .bl .h { color: var(--blue); }
+    .bl .s { color: var(--muted); }
+    .bl .ok { color: var(--green); }
+    .bl .warn { color: var(--amber); }
 
-    /* ── MAIN LAYOUT ────────────────────────────────────────────── */
-    #app {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
-    }
-    #app.visible { display: flex; }
+    /* ─── APP ───────────────────────────────────────────────── */
+    #app { display: none; flex-direction: column; height: 100vh; }
+    #app.on { display: flex; }
 
     /* title bar */
-    #titlebar {
-      height: 30px;
-      background: var(--bg3);
+    #tb {
+      height: 28px; background: #1f1f1f;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 14px;
-      gap: 7px;
-      flex-shrink: 0;
-      user-select: none;
+      display: flex; align-items: center;
+      padding: 0 12px; gap: 6px; flex-shrink: 0;
     }
-    .dot { width: 11px; height: 11px; border-radius: 50%; }
-    .dot.red    { background: #ff5f57; }
-    .dot.yellow { background: #febc2e; }
-    .dot.green  { background: #28c840; }
-    #titlebar-label {
-      margin-left: auto;
-      margin-right: auto;
-      color: var(--text-dim);
-      font-size: 11px;
-      letter-spacing: 0.04em;
+    .dot { width: 12px; height: 12px; border-radius: 50%; cursor: default; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    #tb-title {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      color: var(--textdim); font-size: 11px; pointer-events: none;
+      white-space: nowrap;
     }
 
-    /* body row (sidebar + content) */
+    /* body row */
     #body { display: flex; flex: 1; min-height: 0; }
 
-    /* activity bar (thin icon strip) */
-    #actbar {
-      width: 42px;
-      background: var(--bg2);
+    /* activity strip */
+    #act {
+      width: 44px; background: #181818;
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-top: 8px;
-      gap: 6px;
-      flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; padding-top: 6px; gap: 4px; flex-shrink: 0;
     }
-    .act-icon {
-      width: 30px; height: 30px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 4px;
-      color: var(--muted);
-      font-size: 14px;
-      cursor: pointer;
-      transition: color 0.15s, background 0.15s;
+    .ai {
+      width: 32px; height: 32px; display: flex;
+      align-items: center; justify-content: center;
+      border-radius: 5px; color: var(--muted); font-size: 15px;
+      cursor: pointer; transition: color .15s, background .15s;
+      border-left: 2px solid transparent;
     }
-    .act-icon:hover, .act-icon.active { color: var(--green); background: var(--bg3); }
+    .ai:hover { color: var(--text); }
+    .ai.on { color: var(--green); border-left-color: var(--green); }
 
     /* sidebar */
-    #sidebar {
-      width: 200px;
-      background: var(--bg2);
+    #sb {
+      width: 210px; background: var(--bg2);
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow: hidden;
+      display: flex; flex-direction: column; flex-shrink: 0;
+      overflow-y: auto;
     }
-    .sidebar-section { font-size: 10px; color: var(--muted); text-transform: uppercase;
-      letter-spacing: 0.1em; padding: 10px 12px 6px; }
+    .sb-hdr {
+      font-size: 10px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .12em;
+      padding: 10px 14px 5px;
+    }
 
-    .tree-item {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-dim);
-      transition: background 0.1s, color 0.1s;
+    .ti {
+      display: flex; align-items: center; gap: 7px;
+      padding: 4px 12px; cursor: pointer; font-size: 12px;
+      color: var(--textdim); transition: background .1s, color .1s;
       user-select: none;
     }
-    .tree-item:hover { background: var(--bg3); color: var(--text); }
-    .tree-item.active { background: #1a2a1a; color: var(--green); }
-    .tree-item.folder { color: var(--amber); font-size: 12px; }
-    .tree-item.folder:hover { color: var(--amber); }
-    .tree-item.child { padding-left: 26px; }
-    .tree-icon { width: 14px; font-size: 11px; text-align: center; flex-shrink: 0; }
+    .ti:hover { background: var(--bg3); color: var(--text); }
+    .ti.on { background: #192c19; color: var(--green); }
+    .ti.fold { color: var(--amber); }
+    .ti.fold:hover { color: #f5d98f; background: var(--bg3); }
+    .ti.child { padding-left: 28px; }
+    .ti .ic { width: 14px; font-style: normal; font-size: 12px; text-align: center; flex-shrink: 0; }
 
     /* content */
-    #content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 40px 48px;
-      background: var(--bg);
+    #ct {
+      flex: 1; overflow-y: auto;
+      padding: 28px 44px 56px; background: var(--bg);
     }
 
-    .page { display: none; }
-    .page.active { display: block; }
+    .pg { display: none; }
+    .pg.on { display: block; }
 
-    .page-path {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 22px;
-      padding-bottom: 10px;
+    .fp {
+      font-size: 11px; color: var(--muted);
+      margin-bottom: 20px; padding-bottom: 10px;
       border-bottom: 1px solid var(--border);
     }
 
-    h1 { color: var(--green); font-size: 22px; margin-bottom: 4px; }
-    .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 22px; }
-    h2 { color: var(--green-dim); font-size: 14px; margin: 22px 0 8px; }
-    h3 { color: var(--green); font-size: 13px; margin: 14px 0 6px; }
+    h1 { color: var(--green); font-size: 22px; margin-bottom: 3px; }
+    .sub { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
+    h2 { color: var(--gdim); font-size: 14px; margin: 22px 0 8px; }
+    h3 { color: var(--green); font-size: 13px; margin: 14px 0 6px; font-weight: bold; }
 
     p { color: var(--text); line-height: 1.75; margin-bottom: 10px; font-size: 13px; }
+    code { color: var(--green); }
 
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 4px; }
     .tag {
-      padding: 2px 9px;
-      border: 1px solid var(--green);
-      color: var(--green);
-      font-size: 11px;
-      border-radius: 2px;
-      background: #001a07;
+      padding: 2px 8px; border: 1px solid #00ff4155;
+      color: var(--gdim); font-size: 11px; border-radius: 2px;
+      background: #001a08;
     }
 
     .card {
-      background: var(--bg2);
-      border: 1px solid #1e3a1e;
+      background: #0f1f10; border: 1px solid #1e3a1e;
       border-left: 3px solid var(--green);
-      padding: 16px 18px;
-      margin-bottom: 16px;
-      border-radius: 2px;
+      padding: 15px 18px; margin-bottom: 14px; border-radius: 2px;
     }
     .card h3 { margin-top: 0; font-size: 14px; }
 
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
     th { color: var(--muted); font-weight: normal; text-align: left;
       padding: 5px 10px; border-bottom: 1px solid var(--border); }
     td { padding: 5px 10px; color: var(--text); border-bottom: 1px solid #181818; }
-    td.win { color: #16A34A; }
-    td.lose { color: #ef4444; }
-    td.fc { color: var(--green); }
+    td.w { color: #16A34A; } td.l { color: #ef4444; } td.fc { color: var(--green); }
 
     .note { font-size: 11px; color: var(--muted); margin-top: 10px; font-style: italic; }
 
-    /* JSON contact */
-    .json-view {
-      font-size: 13px;
-      line-height: 2;
-      color: var(--text);
-    }
-    .jk { color: #9cdcfe; }
-    .js { color: #ce9178; }
-    .jl { color: var(--blue); cursor: pointer; text-decoration: underline; }
-    .jl:hover { color: var(--green); }
+    .json { font-size: 13px; line-height: 2.1; color: var(--text); }
+    .jk { color: #9cdcfe; } .js { color: #ce9178; }
+    .jl { color: var(--blue); cursor: pointer; }
+    .jl:hover { text-decoration: underline; }
     .jp { color: var(--muted); }
 
     /* status bar */
-    #statusbar {
-      height: 22px;
-      background: var(--green);
-      color: var(--bg);
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      font-size: 11px;
-      font-weight: bold;
-      gap: 16px;
-      flex-shrink: 0;
-      user-select: none;
+    #sbar {
+      height: 22px; background: var(--green); color: #0a0a0a;
+      display: flex; align-items: center; padding: 0 12px;
+      font-size: 11px; font-weight: bold; gap: 14px; flex-shrink: 0;
     }
-    #status-file { margin-left: auto; }
+    #sbar-file { margin-left: auto; }
 
-    /* scrollbar */
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
-    /* cursor */
-    .cursor {
-      display: inline-block;
-      width: 7px; height: 13px;
-      background: var(--green);
-      vertical-align: middle;
-      margin-left: 1px;
+    .cur {
+      display: inline-block; width: 7px; height: 13px;
+      background: var(--green); vertical-align: middle; margin-left: 2px;
       animation: blink 1.1s step-end infinite;
     }
     @keyframes blink { 50% { opacity: 0; } }
 
-    a { color: var(--blue); }
-    code { color: var(--green); font-family: inherit; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
 
-<!-- ── BOOT SCREEN ─────────────────────────────────────────────── -->
+<!-- ─── BOOT SCREEN ───────────────────────────────────── -->
 <div id="boot">
-  <pre id="ascii">
- ██████╗  ██╗  ██╗ ██████╗  ██████╗   ████╗  ██╗         ██╗ ██╗  ██╗  ███╗    ██████╗    ██╗    ██╗  ██╗  ██████╗    ██████╗
- ██╔══██╗ ███╗ ██║ ██╔══██╗ ██╔══██╗ ██╔══██╗ ██╗        ██╔╝ ██║  ██║ ██╔██╗  ██╔══██╗  ██╔██╗  ██║  ██║  ██╔══██╗  ██╔══██╗
- ██████╔╝ ██╔██╗██║ ██████╔╝ ██████╔╝ ███████║  ██╗      ██╔╝  ██╗███╔╝ ██║╚██╗ ██████╔╝ ██╔╝╚██╗ ██║  ██║  ███████║  ██████╔╝
- ██╔══██╗ ██║╚████║ ██╔══██╗ ██╔══██╗ ██╔══██║  ╚██╗    ██╔╝   ╚████╔╝  ██║ ╚██╗██╔═══╝  ███████╔╝ ╚████╔╝  ██╔══██║  ██╔══██╗
- ██║  ██║ ██║ ╚███║ ██║  ██║ ██║  ██║ ██║  ██║   ╚██╗  ██╔╝     ╚██╔╝   ██║  ╚██╗██║      ██╔══██║   ╚██╔╝   ██║  ██║  ██║  ██║
- ╚═╝  ╚═╝ ╚═╝  ╚══╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝    ╚═══╝╚═╝       ╚═╝    ╚═╝   ╚═╝╚═╝      ╚═╝  ╚═╝    ╚═╝    ╚═╝  ╚═╝  ╚═╝  ╚═╝
-</pre>
+<pre id="ascii">         ______  __  __  ______  __  __
+ /'\_/`\/\  _  \/\ \/\ \/\  _  \/\ \/\ \
+/\      \ \ \L\ \ \ `\\ \ \ \L\ \ \ `\\ \
+\ \ \__\ \ \  __ \ \ , ` \ \  __ \ \ , ` \
+ \ \ \_/\ \ \ \/\ \ \ \`\ \ \ \/\ \ \ \`\ \
+  \ \_\\ \_\ \_\ \_\ \_\ \_\ \_\ \_\ \_\ \_\
+   \/_/ \/_/\/_/\/_/\/_/\/_/\/_/\/_/\/_/\/_/
+
+ __  __   __  __  ______  ____    __      __  ______  ____
+/\ \/\ \ /\ \/\ \/\  _  \/\  _`\ /\ \  __/\ \/\  _  \/\  _`\
+\ \ \/'/'\ \ \_\ \ \ \L\ \ \ \L\ \ \ \/\ \ \ \ \ \L\ \ \ \L\ \
+ \ \ , <  \ \  _  \ \  __ \ \ ,  /\ \ \ \ \ \ \ \  __ \ \ ,  /
+  \ \ \\`\ \ \ \ \ \ \ \/\ \ \ \\ \\ \ \_/ \_\ \ \ \/\ \ \ \\ \
+   \ \_\ \_\\ \_\ \_\ \_\ \_\ \_\ \_\ `\___x___/\ \_\ \_\ \_\ \_\
+    \/_/\/_/ \/_/\/_/\/_/\/_/\/_/\/ /'\/__//__/  \/_/\/_/\/_/\/ /</pre>
 
   <div id="boot-log"></div>
 </div>
 
-<!-- ── MAIN APP ─────────────────────────────────────────────────── -->
+<!-- ─── MAIN APP ──────────────────────────────────────── -->
 <div id="app">
-  <!-- title bar -->
-  <div id="titlebar">
-    <div class="dot red"></div>
-    <div class="dot yellow"></div>
-    <div class="dot green"></div>
-    <span id="titlebar-label">manan@portfolio: ~/portfolio</span>
+
+  <div id="tb">
+    <div class="dot r"></div>
+    <div class="dot y"></div>
+    <div class="dot g"></div>
+    <span id="tb-title">manan@portfolio — ~/portfolio/ABOUT_ME.md</span>
   </div>
 
   <div id="body">
-    <!-- activity bar -->
-    <div id="actbar">
-      <div class="act-icon active" title="Explorer" onclick="toggleSidebar()">&#9776;</div>
-      <div class="act-icon" title="GitHub" onclick="window.open('https://github.com/manankharwar')">&#9671;</div>
+
+    <!-- activity strip -->
+    <div id="act">
+      <div class="ai on" title="Explorer" onclick="toggleSB()">&#9776;</div>
+      <div class="ai" title="GitHub" onclick="go('https://github.com/manankharwar')">&#9672;</div>
+      <div class="ai" title="LinkedIn" onclick="go('https://linkedin.com/in/manankharwar')">&#9670;</div>
     </div>
 
     <!-- sidebar -->
-    <div id="sidebar">
-      <div class="sidebar-section">Portfolio</div>
+    <div id="sb">
+      <div class="sb-hdr">Portfolio</div>
 
-      <div class="tree-item active" id="fi-about" onclick="nav('about')">
-        <span class="tree-icon">&#128196;</span> ABOUT_ME.md
+      <div class="ti on" id="fi-about" onclick="nav('about')">
+        <i class="ic">&#128196;</i> ABOUT_ME.md
       </div>
 
-      <div class="tree-item folder" id="fi-proj" onclick="toggleFolder()">
-        <span class="tree-icon" id="proj-arrow">&#9654;</span> PROJECTS
+      <!-- PROJECTS folder -->
+      <div class="ti fold" onclick="toggleF('proj')">
+        <i class="ic" id="arr-proj">&#9654;</i> PROJECTS
       </div>
-      <div id="proj-children" style="display:none">
-        <div class="tree-item child" id="fi-fc" onclick="nav('fc')">
-          <span class="tree-icon">&#9881;</span> fusioncore.cpp
+      <div id="ch-proj" style="display:none">
+        <div class="ti child" id="fi-fc" onclick="nav('fc')">
+          <i class="ic">&#9881;</i> fusioncore.cpp
         </div>
-        <div class="tree-item child" id="fi-bench" onclick="nav('bench')">
-          <span class="tree-icon">&#128202;</span> benchmarks.py
+        <div class="ti child" id="fi-husky" onclick="nav('husky')">
+          <i class="ic">&#128268;</i> husky_bringup.yaml
+        </div>
+        <div class="ti child" id="fi-nav" onclick="nav('nav')">
+          <i class="ic">&#127757;</i> nav2_bridge.cpp
+        </div>
+        <div class="ti child" id="fi-bench" onclick="nav('bench')">
+          <i class="ic">&#128202;</i> nclt_bench.py
         </div>
       </div>
 
-      <div class="tree-item" id="fi-contact" onclick="nav('contact')">
-        <span class="tree-icon">&#123;</span> CONTACT.json
+      <div class="ti" id="fi-contact" onclick="nav('contact')">
+        <i class="ic">&#123;</i> CONTACT.json
       </div>
 
-      <div class="tree-item" onclick="alert('Resume coming soon.')">
-        <span class="tree-icon">&#128196;</span> RESUME.pdf
+      <div class="ti" onclick="alert('Resume — coming soon.')">
+        <i class="ic">&#128196;</i> RESUME.pdf
       </div>
     </div>
 
-    <!-- content -->
-    <div id="content">
+    <!-- content area -->
+    <div id="ct">
 
-      <!-- ABOUT ME -->
-      <div class="page active" id="pg-about">
-        <div class="page-path">~/portfolio/ABOUT_ME.md</div>
+      <!-- ABOUT ME ─────────────────────────────────────── -->
+      <div class="pg on" id="pg-about">
+        <div class="fp">~/portfolio/ABOUT_ME.md</div>
         <h1>Manan Kharwar</h1>
-        <div class="subtitle">Robotics Software Engineer &nbsp;·&nbsp; Sensor Fusion &nbsp;·&nbsp; Autonomous Systems<span class="cursor"></span></div>
+        <div class="sub">Robotics Software Engineer &nbsp;·&nbsp; Sensor Fusion &nbsp;·&nbsp; Autonomous Systems<span class="cur"></span></div>
 
-        <h2># Who I am</h2>
+        <h2># About</h2>
         <p>
           I build software for robots that need to know where they are. My focus is sensor fusion —
-          taking noisy, unreliable signals from IMUs, GPS, and wheel encoders and producing a single,
-          reliable state estimate your robot can actually navigate from.
+          combining noisy signals from IMUs, GPS, and wheel encoders into a single state estimate that's
+          actually good enough to navigate from.
         </p>
         <p>
-          I'm the author of <code>FusionCore</code>, a ROS 2 UKF that I built after hitting the same
-          walls with <code>robot_localization</code> too many times: no native ECEF GPS handling,
-          no IMU bias estimation, and noise covariances you have to hand-tune and re-tune.
+          I'm the author of FusionCore, a ROS 2 UKF I started after hitting the same walls with
+          <code>robot_localization</code> too many times. I've also done hands-on hardware bring-up
+          on real mobile platforms (Clearpath Husky), integrated full Nav2 navigation stacks, and
+          run reproducible, honest benchmarks across six outdoor sequences spanning all four seasons.
         </p>
         <p>
-          I benchmark honestly. Six sequences across all four seasons on NCLT — wins and the one loss
-          both reported.
+          I care about correctness over cleverness — and about shipping things that actually work
+          on real robots, not just in simulation.
         </p>
 
         <h2># Stack</h2>
@@ -361,246 +312,292 @@
           <span class="tag">GNSS / RTK / ECEF</span>
           <span class="tag">IMU bias estimation</span>
           <span class="tag">Nav2</span>
+          <span class="tag">Clearpath Husky</span>
+          <span class="tag">BNO085</span>
           <span class="tag">Linux / WSL2</span>
-          <span class="tag">CMake</span>
-          <span class="tag">colcon</span>
+          <span class="tag">CMake / colcon</span>
         </div>
 
         <h2># Currently</h2>
         <p>
-          Running the FusionCore NCLT benchmark suite — 6 outdoor sequences, identical config,
-          same pipeline as robot_localization. Writing about it openly.
+          Running open benchmarks comparing FusionCore against robot_localization across the NCLT
+          dataset — six outdoor sequences, all seasons, identical config.
+          Writing about the results honestly, wins and the one loss both included.
         </p>
       </div>
 
-      <!-- FUSIONCORE -->
-      <div class="page" id="pg-fc">
-        <div class="page-path">~/portfolio/PROJECTS/fusioncore.cpp</div>
+      <!-- FUSIONCORE ───────────────────────────────────── -->
+      <div class="pg" id="pg-fc">
+        <div class="fp">~/portfolio/PROJECTS/fusioncore.cpp</div>
         <h1>FusionCore</h1>
-        <div class="subtitle">ROS 2 UKF sensor fusion &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; Active</div>
+        <div class="sub">ROS 2 UKF sensor fusion &nbsp;·&nbsp; C++17 &nbsp;·&nbsp; Apache 2.0 &nbsp;·&nbsp; Active</div>
 
         <p>
           A 22-state Unscented Kalman Filter for mobile robots. Fuses IMU, wheel encoders, and GPS
-          into one position estimate at 100 Hz. No manual noise tuning.
+          into one position estimate at 100 Hz. Estimates IMU bias online. Adapts noise covariance
+          from the innovation sequence automatically — no hand-tuning.
         </p>
 
         <h2>## Why it exists</h2>
         <p>
-          <code>robot_localization</code> is the default answer for ROS sensor fusion. It works, but
-          it has real gaps: GPS goes through <code>navsat_transform</code> (extra node, added latency,
-          UTM zone boundary issues), no IMU bias estimation, noise covariances you tune by hand.
-        </p>
-        <p>
-          The designated replacement (<code>fuse</code>) still has incomplete GPS support as of early 2026.
-          So I built FusionCore. ECEF GPS handled natively — no coordinate projection, no extra node.
-          IMU bias estimated online. Noise covariance adapted from the innovation sequence.
-          Every sensor gated with a chi-squared test.
+          <code>robot_localization</code> is the default ROS answer. It works, but it has real friction:
+          GPS goes through <code>navsat_transform</code> (extra node, added latency, breaks at UTM zone
+          boundaries), no IMU bias estimation, and covariances you tune by hand and retune every time
+          your hardware or environment changes. FusionCore handles ECEF GPS natively — no projection,
+          no extra node. Chi-squared gating on every sensor.
         </p>
 
-        <h2>## Benchmark — NCLT dataset, 6 sequences, all seasons</h2>
+        <h2>## Benchmark — NCLT, 6 sequences, all seasons</h2>
         <div class="card">
-          <h3>vs robot_localization EKF — same config, same pipeline</h3>
+          <h3>vs robot_localization EKF — identical config, same pipeline</h3>
           <table>
-            <thead>
-              <tr>
-                <th>Sequence</th>
-                <th style="text-align:right">FC ATE</th>
-                <th style="text-align:right">RL ATE</th>
-                <th style="text-align:right">Winner</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Sequence</th><th style="text-align:right">FC ATE</th><th style="text-align:right">RL ATE</th><th style="text-align:right">Result</th></tr></thead>
             <tbody>
-              <tr><td>Jan 2012 (Winter)</td><td class="fc" style="text-align:right">5.6 m</td><td style="text-align:right">23.5 m</td><td class="win" style="text-align:right">FC &nbsp;4.2×</td></tr>
-              <tr><td>Feb 2012 (Winter)</td><td class="fc" style="text-align:right">9.7 m</td><td style="text-align:right">20.5 m</td><td class="win" style="text-align:right">FC &nbsp;2.1×</td></tr>
-              <tr><td>Mar 2012 (Spring)</td><td class="fc" style="text-align:right">4.2 m</td><td style="text-align:right">10.8 m</td><td class="win" style="text-align:right">FC &nbsp;2.6×</td></tr>
-              <tr><td>Aug 2012 (Summer)</td><td class="fc" style="text-align:right">7.5 m</td><td style="text-align:right">9.4 m</td><td class="win" style="text-align:right">FC &nbsp;1.3×</td></tr>
-              <tr><td>Nov 2012 (Fall)</td><td style="text-align:right">28.7 m</td><td class="fc" style="text-align:right">10.9 m</td><td class="lose" style="text-align:right">RL &nbsp;2.6×</td></tr>
-              <tr><td>Feb 2013 (Winter)</td><td class="fc" style="text-align:right">4.1 m</td><td style="text-align:right">5.8 m</td><td class="win" style="text-align:right">FC &nbsp;1.4×</td></tr>
+              <tr><td>Jan 2012 (Winter)</td><td class="fc" style="text-align:right">5.6 m</td><td style="text-align:right">23.5 m</td><td class="w" style="text-align:right">FC 4.2×</td></tr>
+              <tr><td>Feb 2012 (Winter)</td><td class="fc" style="text-align:right">9.7 m</td><td style="text-align:right">20.5 m</td><td class="w" style="text-align:right">FC 2.1×</td></tr>
+              <tr><td>Mar 2012 (Spring)</td><td class="fc" style="text-align:right">4.2 m</td><td style="text-align:right">10.8 m</td><td class="w" style="text-align:right">FC 2.6×</td></tr>
+              <tr><td>Aug 2012 (Summer)</td><td class="fc" style="text-align:right">7.5 m</td><td style="text-align:right">9.4 m</td><td class="w" style="text-align:right">FC 1.3×</td></tr>
+              <tr><td>Nov 2012 (Fall)</td><td style="text-align:right">28.7 m</td><td class="fc" style="text-align:right">10.9 m</td><td class="l" style="text-align:right">RL 2.6×</td></tr>
+              <tr><td>Feb 2013 (Winter)</td><td class="fc" style="text-align:right">4.1 m</td><td style="text-align:right">5.8 m</td><td class="w" style="text-align:right">FC 1.4×</td></tr>
             </tbody>
           </table>
-          <p class="note">ATE RMSE (m). Lower is better. Nov 2012: degraded GPS season. FC's rejection gate works against it when GPS noise is high but consistent — RL corrects faster without a gate.</p>
+          <p class="note">ATE RMSE (m). Lower is better. Nov 2012: degraded GPS season. RL's lack of a rejection gate lets it self-correct faster; FC's gate holds out the noisy GPS longer.</p>
         </div>
 
-        <h2>## Links</h2>
+        <div class="tags">
+          <span class="tag">ROS 2 Jazzy</span><span class="tag">C++17</span>
+          <span class="tag">UKF</span><span class="tag">ECEF GPS</span>
+          <span class="tag">IMU bias</span><span class="tag">Chi-squared gating</span>
+          <span class="tag">100 Hz</span><span class="tag">Apache 2.0</span>
+        </div>
+        <p style="margin-top:14px"><a href="https://github.com/manankharwar/fusioncore" target="_blank">github.com/manankharwar/fusioncore</a></p>
+      </div>
+
+      <!-- HUSKY BRINGUP ────────────────────────────────── -->
+      <div class="pg" id="pg-husky">
+        <div class="fp">~/portfolio/PROJECTS/husky_bringup.yaml</div>
+        <h1>Husky + BNO085 Hardware Bringup</h1>
+        <div class="sub">Clearpath Husky UGV &nbsp;·&nbsp; BNO085 IMU &nbsp;·&nbsp; ROS 2 Jazzy</div>
+
         <p>
-          <a href="https://github.com/manankharwar/fusioncore" target="_blank">github.com/manankharwar/fusioncore</a>
+          End-to-end hardware bring-up for a Clearpath Husky UGV running FusionCore on ROS 2 Jazzy,
+          using the BNO085 IMU. This involved writing hardware-specific sensor configs,
+          calibrating IMU-to-base-link transforms, and tuning the EKF process noise for the
+          Husky's ground-contact dynamics.
         </p>
 
+        <h2>## What it covers</h2>
+        <div class="card">
+          <h3>BNO085 → ROS 2 integration</h3>
+          <p>Driver configuration, quaternion output validation, gravity subtraction verification.
+          Confirmed IMU data quality before passing into the fusion stack.</p>
+        </div>
+        <div class="card">
+          <h3>robot_localization migration guide</h3>
+          <p>Step-by-step guide for teams migrating from robot_localization EKF to FusionCore
+          on new platforms — what parameters map to what, what to discard, what to re-tune.</p>
+        </div>
+        <div class="card">
+          <h3>Environment preset YAMLs</h3>
+          <p>GPS quality scenario presets: open sky, urban canyon, degraded signal. Drop-in
+          config files so teams don't have to retune from scratch per deployment site.</p>
+        </div>
+
         <div class="tags">
-          <span class="tag">ROS 2 Jazzy</span>
-          <span class="tag">C++17</span>
-          <span class="tag">UKF</span>
-          <span class="tag">ECEF GPS</span>
-          <span class="tag">IMU bias</span>
-          <span class="tag">chi-squared gating</span>
-          <span class="tag">100 Hz</span>
-          <span class="tag">Apache 2.0</span>
+          <span class="tag">Clearpath Husky</span><span class="tag">BNO085</span>
+          <span class="tag">ROS 2 Jazzy</span><span class="tag">Hardware</span>
+          <span class="tag">YAML config</span><span class="tag">IMU calibration</span>
         </div>
       </div>
 
-      <!-- BENCHMARKS -->
-      <div class="page" id="pg-bench">
-        <div class="page-path">~/portfolio/PROJECTS/benchmarks.py</div>
-        <h1>NCLT Benchmark Suite</h1>
-        <div class="subtitle">Reproducible &nbsp;·&nbsp; Open methodology &nbsp;·&nbsp; All seasons</div>
+      <!-- NAV2 BRIDGE ──────────────────────────────────── -->
+      <div class="pg" id="pg-nav">
+        <div class="fp">~/portfolio/PROJECTS/nav2_bridge.cpp</div>
+        <h1>Nav2 Integration</h1>
+        <div class="sub">FusionCore as Nav2 localization source &nbsp;·&nbsp; Full navigation stack</div>
 
         <p>
-          A full pipeline for benchmarking robot localization on the NCLT (University of Michigan
-          North Campus Long-Term Vision and Lidar Dataset). Six sequences across winter, spring,
-          summer, and fall. RTK GPS as ground truth.
+          Wired FusionCore into a full Nav2 navigation stack. FusionCore publishes the
+          <code>map → odom → base_link</code> TF chain and an <code>/odom</code> topic that
+          Nav2's controller and planner consume directly.
         </p>
 
-        <h2>## Why it matters</h2>
-        <p>
-          Most sensor fusion benchmarks cherry-pick their best sequence. This one doesn't.
-          All six sequences are reported — including the one FusionCore loses.
-        </p>
-        <p>
-          The RL comparison uses Mahalanobis gating enabled (chi²(2,0.999) = 13.82 → threshold 3.72).
-          The gate had no effect on any of the six sequences — original comparison was already fair.
-        </p>
-
-        <h2>## Pipeline</h2>
+        <h2>## What was involved</h2>
         <div class="card">
-          <h3>Reproducible end-to-end</h3>
-          <p style="font-size:12px; color: var(--muted);">
-            ROS2 bag playback at 3× speed<br>
-            → FusionCore &amp; RL-EKF record to bag<br>
-            → TUM trajectory files extracted<br>
-            → <code>evo_ape</code> ATE evaluation<br>
-            → matplotlib publication figures
+          <h3>TF chain management</h3>
+          <p>FusionCore owns the <code>odom → base_link</code> transform. A static
+          <code>map → odom</code> identity bridge handles the Nav2 localization assumption.
+          No AMCL, no slam_toolbox required for GPS-primary environments.</p>
+        </div>
+        <div class="card">
+          <h3>Launch architecture</h3>
+          <p><code>fusioncore_nav2.launch.py</code> — single launch file that brings up the full
+          stack: FusionCore, navsat_transform (optional), Nav2 BT navigator, costmap,
+          and the controller server.</p>
+        </div>
+        <div class="card">
+          <h3>Outdoor navigation</h3>
+          <p>Validated on outdoor campus routes. GPS provides global position;
+          wheel odometry + IMU provide smooth inter-GPS interpolation.
+          Nav2 receives a 100 Hz pose stream with correct covariance.</p>
+        </div>
+
+        <div class="tags">
+          <span class="tag">Nav2</span><span class="tag">ROS 2 Jazzy</span>
+          <span class="tag">TF2</span><span class="tag">C++17</span>
+          <span class="tag">GPS navigation</span><span class="tag">Behaviour Trees</span>
+        </div>
+      </div>
+
+      <!-- NCLT BENCHMARK ───────────────────────────────── -->
+      <div class="pg" id="pg-bench">
+        <div class="fp">~/portfolio/PROJECTS/nclt_bench.py</div>
+        <h1>NCLT Benchmark Pipeline</h1>
+        <div class="sub">Reproducible &nbsp;·&nbsp; Open methodology &nbsp;·&nbsp; RTK GPS ground truth</div>
+
+        <p>
+          A fully reproducible pipeline for benchmarking mobile robot localization on the NCLT
+          dataset — six sequences across all four seasons, RTK GPS as ground truth.
+        </p>
+
+        <h2>## Design principles</h2>
+        <p>
+          Most sensor fusion benchmarks report only their best sequences. This one reports all six,
+          including the one FusionCore loses. The RL comparison uses Mahalanobis gating enabled
+          (chi²(2, 0.999) = 13.82) — the fairest possible comparison.
+        </p>
+
+        <div class="card">
+          <h3>Pipeline</h3>
+          <p style="color:var(--muted); font-size:12px; line-height:2">
+            ROS 2 bag playback at 3× speed<br>
+            → FusionCore + RL-EKF run simultaneously<br>
+            → Trajectories extracted to TUM format<br>
+            → <code>evo_ape</code> ATE evaluation with SE3 alignment<br>
+            → Publication-quality matplotlib figures generated
           </p>
         </div>
 
         <div class="tags">
-          <span class="tag">Python 3</span>
-          <span class="tag">evo</span>
-          <span class="tag">matplotlib</span>
-          <span class="tag">ROS 2</span>
-          <span class="tag">NCLT dataset</span>
+          <span class="tag">Python 3</span><span class="tag">evo</span>
+          <span class="tag">matplotlib</span><span class="tag">ROS 2</span>
+          <span class="tag">NCLT dataset</span><span class="tag">RTK GPS</span>
         </div>
       </div>
 
-      <!-- CONTACT -->
-      <div class="page" id="pg-contact">
-        <div class="page-path">~/portfolio/CONTACT.json</div>
+      <!-- CONTACT ──────────────────────────────────────── -->
+      <div class="pg" id="pg-contact">
+        <div class="fp">~/portfolio/CONTACT.json</div>
         <h1>Contact</h1>
 
-        <div class="json-view" style="margin-top:24px">
-          <span class="jp">{</span><br>
-          &nbsp;&nbsp;<span class="jk">"name"</span><span class="jp">:</span> <span class="js">"Manan Kharwar"</span><span class="jp">,</span><br>
-          &nbsp;&nbsp;<span class="jk">"github"</span><span class="jp">:</span> <span class="jl" onclick="window.open('https://github.com/manankharwar')">"github.com/manankharwar"</span><span class="jp">,</span><br>
-          &nbsp;&nbsp;<span class="jk">"linkedin"</span><span class="jp">:</span> <span class="jl" onclick="window.open('https://linkedin.com/in/manankharwar')">"linkedin.com/in/manankharwar"</span><span class="jp">,</span><br>
-          &nbsp;&nbsp;<span class="jk">"open_to"</span><span class="jp">:</span> [<span class="js">"robotics engineering"</span><span class="jp">,</span> <span class="js">"sensor fusion"</span><span class="jp">,</span> <span class="js">"collaboration"</span>]<span class="jp">,</span><br>
-          &nbsp;&nbsp;<span class="jk">"preferred_contact"</span><span class="jp">:</span> <span class="js">"GitHub issues or discussions"</span><br>
-          <span class="jp">}</span>
+        <div class="json" style="margin-top:22px">
+<span class="jp">{</span>
+  <span class="jk">"name"</span><span class="jp">:</span>        <span class="js">"Manan Kharwar"</span><span class="jp">,</span>
+  <span class="jk">"github"</span><span class="jp">:</span>      <span class="jl" onclick="go('https://github.com/manankharwar')">"github.com/manankharwar"</span><span class="jp">,</span>
+  <span class="jk">"linkedin"</span><span class="jp">:</span>    <span class="jl" onclick="go('https://linkedin.com/in/manankharwar')">"linkedin.com/in/manankharwar"</span><span class="jp">,</span>
+  <span class="jk">"open_to"</span><span class="jp">:</span>     [<span class="js">"robotics engineering"</span><span class="jp">,</span> <span class="js">"sensor fusion"</span><span class="jp">,</span> <span class="js">"collaboration"</span>]<span class="jp">,</span>
+  <span class="jk">"contact_via"</span><span class="jp">:</span> <span class="js">"GitHub issues or discussions"</span>
+<span class="jp">}</span>
         </div>
       </div>
 
-    </div><!-- /content -->
+    </div><!-- /ct -->
   </div><!-- /body -->
 
-  <!-- status bar -->
-  <div id="statusbar">
+  <div id="sbar">
     <span>&#11042; MANAN KHARWAR</span>
-    <span style="opacity:0.4">|</span>
+    <span style="opacity:.35">|</span>
     <span>ROS 2 &middot; C++ &middot; Sensor Fusion</span>
-    <span id="status-file" style="margin-left:auto">ABOUT_ME.md</span>
+    <span id="sbar-file">ABOUT_ME.md</span>
   </div>
+
 </div><!-- /app -->
 
 <script>
-  // ── BOOT ──────────────────────────────────────────────────────
-  const BOOT_LINES = [
-    { ps: true,  text: 'Initializing system...' },
-    { ps: true,  text: 'Establishing neural link...' },
-    { ps: true,  text: 'Mounting /home/manan/portfolio...',   cls: 'ok', after: '  ✓ OK' },
-    { ps: true,  text: 'Loading sensor fusion modules...',    cls: 'ok', after: '  ✓ OK' },
-    { ps: true,  text: 'Calibrating IMU bias estimator...',   cls: 'ok', after: '  ✓ bias = [0.0003, -0.0011, 0.0007]' },
-    { ps: true,  text: 'GPS fix acquired...',                 cls: 'ok', after: '  ✓ HDOP 0.9  accuracy 0.3 m' },
-    { ps: true,  text: 'Initializing UI components...',       cls: 'ok', after: '  ✓ OK' },
-    { ps: false, text: 'Ready.',                              cls: 'ok' },
-  ];
+// ── BOOT ────────────────────────────────────────────────────────
+const LINES = [
+  { cmd: 'boot --init portfolio',       out: null },
+  { cmd: 'mount /home/manan/portfolio', out: '  \x1b[ok]OK\x1b[/]  /portfolio mounted (read-write)' },
+  { cmd: 'load sensor_fusion_modules',  out: '  \x1b[ok]OK\x1b[/]  fusioncore v2.1  eigen 3.4  ros2-jazzy' },
+  { cmd: 'calibrate imu --online',      out: '  \x1b[ok]OK\x1b[/]  bias = [0.0003, -0.0011, 0.0007] rad/s' },
+  { cmd: 'gps --fix',                   out: '  \x1b[ok]OK\x1b[/]  HDOP 0.9  accuracy 0.3 m  sats 12' },
+  { cmd: 'init ui --theme terminal',    out: '  \x1b[ok]OK\x1b[/]  renderer ready' },
+  { cmd: 'echo "Ready."',               out: null },
+];
 
-  const log = document.getElementById('boot-log');
+const log = document.getElementById('boot-log');
 
-  function mkLine(cfg) {
-    const div = document.createElement('div');
-    div.className = 'boot-line';
-    if (cfg.ps) {
-      div.innerHTML =
-        `<span class="ps1-user">manan@portfolio</span><span class="ps1-sep">:</span><span class="ps1-dir">~</span><span class="ps1-sep">$</span> <span class="ps1-cmd">${cfg.text}</span>` +
-        (cfg.after ? `<span class="${cfg.cls}">${cfg.after}</span>` : '');
-    } else {
-      div.innerHTML = `<span class="${cfg.cls || ''}">${cfg.text}</span>`;
-    }
-    return div;
+function mkLine(cfg) {
+  const div = document.createElement('div');
+  div.className = 'bl';
+  let html = `<span class="u">manan@portfolio</span><span class="s">:</span><span class="h">~</span><span class="s">$</span> ${cfg.cmd}`;
+  if (cfg.out) {
+    const out = cfg.out.replace('\x1b[ok]', '<span class="ok">').replace('\x1b[/]', '</span>');
+    html += `\n${out}`;
   }
+  div.innerHTML = html;
+  return div;
+}
 
-  // show ASCII first
-  setTimeout(() => document.getElementById('ascii').classList.add('show'), 120);
+setTimeout(() => document.getElementById('ascii').classList.add('show'), 100);
 
-  // stagger boot lines
-  BOOT_LINES.forEach((cfg, i) => {
-    const delay = 600 + i * 280;
-    setTimeout(() => {
-      const el = mkLine(cfg);
-      log.appendChild(el);
-      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
-    }, delay);
-  });
-
-  // fade boot → app
-  const totalBoot = 600 + BOOT_LINES.length * 280 + 520;
+LINES.forEach((cfg, i) => {
   setTimeout(() => {
-    document.getElementById('boot').classList.add('fade-out');
-    setTimeout(() => {
-      document.getElementById('boot').style.display = 'none';
-      const app = document.getElementById('app');
-      app.classList.add('visible');
-    }, 720);
-  }, totalBoot);
+    const el = mkLine(cfg);
+    log.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+  }, 550 + i * 310);
+});
 
-  // ── NAV ───────────────────────────────────────────────────────
-  const FILE_MAP = {
-    about:   { file: 'fi-about',   page: 'pg-about',   status: 'ABOUT_ME.md',    title: '~/portfolio/ABOUT_ME.md'            },
-    fc:      { file: 'fi-fc',      page: 'pg-fc',      status: 'fusioncore.cpp', title: '~/portfolio/PROJECTS/fusioncore.cpp' },
-    bench:   { file: 'fi-bench',   page: 'pg-bench',   status: 'benchmarks.py',  title: '~/portfolio/PROJECTS/benchmarks.py'  },
-    contact: { file: 'fi-contact', page: 'pg-contact', status: 'CONTACT.json',   title: '~/portfolio/CONTACT.json'            },
-  };
+const bootDone = 550 + LINES.length * 310 + 500;
+setTimeout(() => {
+  const b = document.getElementById('boot');
+  b.classList.add('out');
+  setTimeout(() => {
+    b.style.display = 'none';
+    document.getElementById('app').classList.add('on');
+  }, 700);
+}, bootDone);
 
-  let current = 'about';
+// ── NAV ─────────────────────────────────────────────────────────
+const PAGES = {
+  about:   { fi: 'fi-about',   pg: 'pg-about',   sf: 'ABOUT_ME.md',        tt: '~/portfolio/ABOUT_ME.md'              },
+  fc:      { fi: 'fi-fc',      pg: 'pg-fc',       sf: 'fusioncore.cpp',     tt: '~/portfolio/PROJECTS/fusioncore.cpp'  },
+  husky:   { fi: 'fi-husky',   pg: 'pg-husky',    sf: 'husky_bringup.yaml', tt: '~/portfolio/PROJECTS/husky_bringup.yaml' },
+  nav:     { fi: 'fi-nav',     pg: 'pg-nav',      sf: 'nav2_bridge.cpp',    tt: '~/portfolio/PROJECTS/nav2_bridge.cpp' },
+  bench:   { fi: 'fi-bench',   pg: 'pg-bench',    sf: 'nclt_bench.py',      tt: '~/portfolio/PROJECTS/nclt_bench.py'  },
+  contact: { fi: 'fi-contact', pg: 'pg-contact',  sf: 'CONTACT.json',       tt: '~/portfolio/CONTACT.json'             },
+};
 
-  function nav(id) {
-    if (id === current) return;
-    const prev = FILE_MAP[current];
-    const next = FILE_MAP[id];
+let cur = 'about';
 
-    document.getElementById(prev.page).classList.remove('active');
-    document.getElementById(prev.file).classList.remove('active');
+function nav(id) {
+  if (id === cur) return;
+  document.getElementById(PAGES[cur].pg).classList.remove('on');
+  document.getElementById(PAGES[cur].fi).classList.remove('on');
+  cur = id;
+  document.getElementById(PAGES[cur].pg).classList.add('on');
+  document.getElementById(PAGES[cur].fi).classList.add('on');
+  document.getElementById('sbar-file').textContent = PAGES[cur].sf;
+  document.getElementById('tb-title').textContent = 'manan@portfolio — ' + PAGES[cur].tt;
+  document.getElementById('ct').scrollTop = 0;
+}
 
-    document.getElementById(next.page).classList.add('active');
-    document.getElementById(next.file).classList.add('active');
-    document.getElementById('status-file').textContent = next.status;
-    document.getElementById('titlebar-label').textContent = 'manan@portfolio: ' + next.title;
+const folders = {};
+function toggleF(id) {
+  folders[id] = !folders[id];
+  document.getElementById('ch-' + id).style.display = folders[id] ? 'block' : 'none';
+  document.getElementById('arr-' + id).innerHTML = folders[id] ? '&#9660;' : '&#9654;';
+}
 
-    current = id;
-    document.getElementById('content').scrollTop = 0;
-  }
+let sbVisible = true;
+function toggleSB() {
+  sbVisible = !sbVisible;
+  document.getElementById('sb').style.display = sbVisible ? 'flex' : 'none';
+  document.querySelectorAll('#act .ai')[0].classList.toggle('on', sbVisible);
+}
 
-  let projOpen = false;
-  function toggleFolder() {
-    projOpen = !projOpen;
-    document.getElementById('proj-children').style.display = projOpen ? 'block' : 'none';
-    document.getElementById('proj-arrow').innerHTML = projOpen ? '&#9660;' : '&#9654;';
-  }
-
-  let sidebarVisible = true;
-  function toggleSidebar() {
-    sidebarVisible = !sidebarVisible;
-    document.getElementById('sidebar').style.display = sidebarVisible ? 'flex' : 'none';
-  }
+function go(url) { window.open(url, '_blank'); }
 </script>
-
 </body>
 </html>
